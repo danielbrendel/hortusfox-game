@@ -25,6 +25,7 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('bomb', 'game/assets/sprites/bomb.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('laser', 'game/assets/sprites/laser.png', { frameWidth: 123, frameHeight: 119 });
         this.load.spritesheet('bee', 'game/assets/sprites/bee.png', { frameWidth: 712, frameHeight: 520});
+        this.load.spritesheet('spike', 'game/assets/sprites/spike.png', { frameWidth: 364, frameHeight: 202 });
         this.load.spritesheet('boom', 'game/assets/sprites/explosion.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('puff', 'game/assets/sprites/puff.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('star', 'game/assets/sprites/star.png', { frameWidth: 64, frameHeight: 60 });
@@ -44,6 +45,7 @@ class HortusGame extends Phaser.Scene {
         this.load.audio('monster_shoot', 'game/assets/sounds/monster_shoot.wav');
         this.load.audio('monster_dispose', 'game/assets/sounds/monster_dispose.wav');
         this.load.audio('bee_spawn', 'game/assets/sounds/bee.wav');
+        this.load.audio('spike', 'game/assets/sounds/spike.wav');
 
         this.load.image('heart', 'game/assets/sprites/heart.png');
 
@@ -54,6 +56,7 @@ class HortusGame extends Phaser.Scene {
         this.trees = [];
         this.obstacles = [];
         this.bees = [];
+        this.spike = null;
         this.bombs = [];
         this.lasers = [];
         this.hearts = [];
@@ -67,6 +70,10 @@ class HortusGame extends Phaser.Scene {
         this.tmSpawnBeesSpeed = {
             min: 5000,
             max: 7500
+        };
+        this.tmSpawnSpikeSpeed = {
+            min: 15000,
+            max: 20000
         };
         this.tmGameTime = {
             start: Date.now(),
@@ -198,6 +205,14 @@ class HortusGame extends Phaser.Scene {
             callbackScope: self
         });
 
+        this.spikeTmrConfig = {
+            delay: Phaser.Math.Between(self.tmSpawnSpikeSpeed.min, self.tmSpawnSpikeSpeed.max),
+            loop: true,
+            callback: self.spawnEnemySpike,
+            callbackScope: self
+        };
+        this.spikeTimer = this.time.addEvent(this.spikeTmrConfig);
+
         this.txtTime = this.add.text(gameconfig.scale.width / 2 - 40, 25, 'Time: 0', { fontSize: '24px' });
         this.txtScore = this.add.text(gameconfig.scale.width - 40, 25, 'Score: 0', { rtl: true, fontSize: '24px', color: 'rgb(255, 255, 0)' });
         
@@ -239,6 +254,7 @@ class HortusGame extends Phaser.Scene {
         this.sndMonsterShoot = this.sound.add('monster_shoot');
         this.sndMonsterDispose = this.sound.add('monster_dispose');
         this.sndBeeSpawn = this.sound.add('bee_spawn');
+        this.sndSpike = this.sound.add('spike');
 
         this.children.bringToTop(this.txtScore);
 
@@ -301,6 +317,7 @@ class HortusGame extends Phaser.Scene {
         this.updateObstacles();
         this.updateBees();
         this.updateBombs();
+        this.updateSpike();
 
         this.txtScore.setText('Score: ' + this.playerScore);
     }
@@ -542,6 +559,69 @@ class HortusGame extends Phaser.Scene {
 
                     continue;
                 }
+            }
+        }
+    }
+
+    spawnEnemySpike()
+    {
+        if ((this.playerHealth <= 0) || (this.spike)) {
+            return;
+        }
+
+        let self = this;
+
+        let posx = gameconfig.scale.width - 5;
+        let posy = gameconfig.scale.height - 89;
+
+        let sprite = this.physics.add.sprite(posx, posy, 'spike').setScale(0.3, 0.3).refreshBody();
+
+        this.spike = {
+            sprite: sprite,
+            idle: true,
+            collided: false,
+            timer: this.time.addEvent({
+                delay: 1500,
+                loop: false,
+                callback: function() {
+                    self.spike.idle = false;
+                },
+                callbackScope: self
+            })
+        };
+
+        this.physics.add.collider(this.player, this.spike.sprite, function() {
+            if (self.spike.collided) {
+                return;
+            }
+
+            self.spike.collided = true;
+
+            if (!self.playerInvincible) {
+                self.playerHealth--;
+
+                self.sndHurt.play();
+
+                if (self.playerHealth >= 0) {
+                    self.hearts[self.playerHealth].setVisible(false);
+                }
+            }
+        });
+
+        self.sndSpike.loop = true;
+        self.sndSpike.play();
+    }
+
+    updateSpike()
+    {
+        if ((this.spike) && (!this.spike.idle)) {
+            this.spike.sprite.x -= 10;
+
+            if (this.spike.sprite.x <= -50) {
+                this.sndSpike.stop();
+
+                this.spike.sprite.destroy();
+                this.spike = null;
             }
         }
     }
