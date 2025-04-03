@@ -14,5 +14,5 @@
 */
 
 return [
-    array('test:cmd', 'Add your description here', 'TestCommand'),
+    array('game:build', 'Make a HTML5 game build', 'GameBuildCommand'),
 ];
