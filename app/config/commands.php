@@ -14,5 +14,6 @@
 */
 
 return [
-    array('game:build', 'Make a HTML5 game build', 'GameBuildCommand'),
+    array('game:debug', 'Make a HTML5 debug build', 'CmdGameBuildDebug'),
+    array('game:release', 'Make a HTML5 release build', 'CmdGameBuildRelease'),
 ];

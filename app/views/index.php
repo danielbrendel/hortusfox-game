@@ -40,6 +40,10 @@
                     <a href="{{ env('LINK_PIXELFED') }}"><i class="fas fa-camera"></i></a>
                 </div>
             </div>
+
+            @if (env('APP_DEBUG'))
+                <div class="startmenu-build-type">Build type: Debug</div>
+            @endif
         </div>
     </div>
 </div>

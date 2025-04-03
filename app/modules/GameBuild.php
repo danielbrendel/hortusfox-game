@@ -1,13 +1,21 @@
-<?php 
+<?php
 
-class GameBuildCommand implements Asatru\Commands\Command  {
-    public function handle($args)
+/**
+ * Class GameBuild
+ */
+class GameBuild {
+    /**
+     * @param $debug
+     * @return void
+     */
+    public static function make($debug = false)
     {
-        echo "Building game...\n";
+        $build_type = ($debug) ? 'Debug' : 'Release';
+        echo "Building game (Build type: {$build_type})...\n";
 
         $_SERVER['SERVER_PORT'] = 80;
         $_SERVER['SERVER_NAME'] = 'localhost';
-        $_ENV['APP_DEBUG'] = false;
+        $_ENV['APP_DEBUG'] = $debug;
 
         echo "Creating folders...\n";
         
