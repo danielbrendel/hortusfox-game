@@ -1,6 +1,7 @@
 const PLAYER_MAX_HEALTH = 3;
 const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
+const INVINC_MAXRAND = 10;
 
 class HortusGame extends Phaser.Scene {
     preload()
@@ -25,8 +26,10 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('bee', 'game/assets/sprites/bee.png', { frameWidth: 712, frameHeight: 520});
         this.load.spritesheet('boom', 'game/assets/sprites/explosion.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('puff', 'game/assets/sprites/puff.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('star', 'game/assets/sprites/star.png', { frameWidth: 64, frameHeight: 60 });
 
         this.load.audio('theme', 'game/assets/sounds/theme.ogg');
+        this.load.audio('invincible', 'game/assets/sounds/invincible.wav');
         this.load.audio('jump', 'game/assets/sounds/jump.wav');
         this.load.audio('hurt', 'game/assets/sounds/hurt.wav');
         this.load.audio('explosion', 'game/assets/sounds/explosion.wav');
@@ -51,6 +54,7 @@ class HortusGame extends Phaser.Scene {
         this.hearts = [];
         this.playerScore = 0;
         this.playerHealth = PLAYER_MAX_HEALTH;
+        this.playerInvincible = false;
         this.tmSpawnObstaclesSpeed = {
             min: 2000,
             max: 5000
@@ -98,6 +102,17 @@ class HortusGame extends Phaser.Scene {
         this.player.setBounce(0.2);
         this.player.setCollideWorldBounds(true);
         this.player.setGravity(0, 300);
+
+        this.playerGlow = this.player.preFX.addGlow();
+        this.playerGlow.active = false;
+
+        this.tweens.add({
+            targets: this.playerGlow,
+            outerStrength: 20,
+            yoyo: true,
+            loop: -1,
+            ease: 'sine.inout'
+        });
 
         this.anims.create({
             key: 'walk',
@@ -194,6 +209,7 @@ class HortusGame extends Phaser.Scene {
         }).setVisible(false);
 
         this.sndTheme = this.sound.add('theme');
+        this.sndInvicible = this.sound.add('invincible');
         this.sndJump = this.sound.add('jump');
         this.sndHurt = this.sound.add('hurt');
         this.sndExplosion = this.sound.add('explosion');
@@ -211,6 +227,8 @@ class HortusGame extends Phaser.Scene {
 
         this.sndTheme.loop = true;
         this.sndTheme.play();
+
+        this.sndInvicible.loop = true;
     }
 
     update()
@@ -315,12 +333,14 @@ class HortusGame extends Phaser.Scene {
                     let lasIndex = self.lasers.length - 1;
 
                     self.physics.add.collider(self.player, laser, function() {
-                        self.playerHealth--;
+                        if (!self.playerInvincible) {
+                            self.playerHealth--;
 
-                        self.sndHurt.play();
+                            self.sndHurt.play();
 
-                        if (self.playerHealth >= 0) {
-                            self.hearts[self.playerHealth].setVisible(false);
+                            if (self.playerHealth >= 0) {
+                                self.hearts[self.playerHealth].setVisible(false);
+                            }
                         }
 
                         self.removeLaser(lasIndex);
@@ -341,6 +361,7 @@ class HortusGame extends Phaser.Scene {
 
             self.spawnExplosion(box.x, box.y);
             self.checkSupplySpawn(box.x, box.y);
+            self.checkInvicibleSpawn(box.x, box.y);
 
             if (typeof self.obstacles[obstIndex] !== 'undefined') {
                 self.removeObstacle(obstIndex, true);
@@ -437,12 +458,14 @@ class HortusGame extends Phaser.Scene {
                             let bomIndex = self.bombs.length - 1;
 
                             self.physics.add.collider(self.player, bomb, function() {
-                                self.playerHealth--;
+                                if (!self.playerInvincible) {
+                                    self.playerHealth--;
 
-                                self.sndHurt.play();
+                                    self.sndHurt.play();
 
-                                if (self.playerHealth >= 0) {
-                                    self.hearts[self.playerHealth].setVisible(false);
+                                    if (self.playerHealth >= 0) {
+                                        self.hearts[self.playerHealth].setVisible(false);
+                                    }
                                 }
 
                                 self.removeBomb(bomIndex);
@@ -459,12 +482,13 @@ class HortusGame extends Phaser.Scene {
         let beeIndex = this.bees.length - 1;
 
         this.physics.add.collider(this.player, bee, function() {
-            self.playerScore++;
+            self.playerScore += 5;
 
             self.sndMonsterDispose.play();
 
             self.spawnExplosion(bee.x, bee.y);
             self.checkSupplySpawn(bee.x, bee.y);
+            self.checkInvicibleSpawn(bee.x, bee.y);
 
             if (typeof self.bees[beeIndex] !== 'undefined') {
                 self.removeBee(beeIndex, true);
@@ -726,6 +750,61 @@ class HortusGame extends Phaser.Scene {
             }
 
             supply.destroy();
+        });
+    }
+
+    checkInvicibleSpawn(x, y)
+    {
+        if (!this.playerInvincible) {
+            let rndSpawnItem = Phaser.Math.Between(1, INVINC_MAXRAND);
+            if (rndSpawnItem === INVINC_MAXRAND) {
+                this.spawnInvicibleItem(x, y);
+            }
+        }
+    }
+
+    spawnInvicibleItem(x, y)
+    {
+        let self = this;
+
+        let item = this.physics.add.sprite(x, y, 'star');
+
+        item.setGravityY(200);
+        item.setGravityX(Phaser.Math.Between(-100, 100));
+        item.setCollideWorldBounds(true);
+        item.setBounce(0.5, 0.5);
+
+        self.time.addEvent({
+            delay: 5000,
+            loop: false,
+            callback: function() {
+                self.spawnPuff(item.x, item.y);
+                item.destroy();
+            },
+            callbackScope: self
+        });
+
+        this.physics.add.collider(item, this.platforms);
+
+        this.physics.add.collider(this.player, item, function() {
+            self.playerInvincible = true;
+            self.playerGlow.active = true;
+            self.sndTheme.pause();
+            self.sndInvicible.play();
+
+            self.time.addEvent({
+                delay: 15000,
+                loop: false,
+                callback: function() {
+                    self.playerInvincible = false;
+                    self.playerGlow.active = false;
+                    self.sndInvicible.stop();
+                    self.sndTheme.resume();
+                },
+                callbackScope: self
+            });
+
+            item.destroy();
         });
     }
 
