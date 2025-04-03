@@ -967,6 +967,17 @@ class HortusGame extends Phaser.Scene {
                 });
             }
 
+            if (self.spike) {
+                self.physics.add.collider(detonation, self.spike.sprite, function() {
+                    self.spawnExplosion(self.spike.sprite.x, self.spike.sprite.y);
+
+                    self.sndSpike.stop();
+
+                    self.spike.sprite.destroy();
+                    self.spike = null;
+                });
+            }
+
             self.sndDetonation.play();
         });
     }
