@@ -1,7 +1,7 @@
 const PLAYER_MAX_HEALTH = 3;
 const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
-const INVINC_MAXRAND = 10;
+const INVINC_MAXRAND = 15;
 const BOMB_MAXRAND = 10;
 
 class HortusGame extends Phaser.Scene {
