@@ -28,11 +28,16 @@ Use AquaShell to run development server
 aquashell launch.dnys
 ```
 
-## Make build
+## Make a shippable game build
 
-In order to make a build, simply run the following command
+Make a release build
 ```sh
-php asatru game:build
+php asatru game:release
 ```
 
-This will create a ready-packaged game build in the `/public` directory
+Make a debug build
+```sh
+php asatru game:debug
+```
+
+The ready-packaged game builds are stored in the `/public/builds` directory

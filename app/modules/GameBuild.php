@@ -57,6 +57,19 @@ class GameBuild {
         $game = str_replace('this.load.setBaseURL(window.location.origin);', '', $game);
         file_put_contents(public_path() . '/build/game/game.js', $game);
 
+        if ($debug) {
+            echo "Adding build info...\n";
+
+            $build_info = [
+                'type' => $build_type,
+                'time' => date('Y-m-d H:i:s'),
+                'platform' => PHP_OS,
+                'php' => PHP_VERSION
+            ];
+
+            file_put_contents(public_path() . '/build/version.json', json_encode($build_info));
+        }
+
         echo "Packaging...\n";
 
         $package_name = 'game_build_' . time() . '.zip';
@@ -81,9 +94,12 @@ class GameBuild {
 
         $zip->close();
 
+        copy(public_path() . '/' . $package_name, public_path() . '/builds/' . $package_name);
+
         echo "Cleaning up...\n";
 
         system('rmdir /S /Q "' . $root_path . '"');
+        unlink(public_path() . '/' . $package_name);
 
         echo "Done!\n";
     }
