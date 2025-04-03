@@ -371,15 +371,7 @@ class HortusGame extends Phaser.Scene {
                     let lasIndex = self.lasers.length - 1;
 
                     self.physics.add.collider(self.player, laser, function() {
-                        if (!self.playerInvincible) {
-                            self.playerHealth--;
-
-                            self.sndHurt.play();
-
-                            if (self.playerHealth >= 0) {
-                                self.hearts[self.playerHealth].setVisible(false);
-                            }
-                        }
+                        self.inflictPlayer();
 
                         self.removeLaser(lasIndex);
                     });
@@ -495,15 +487,7 @@ class HortusGame extends Phaser.Scene {
                             let bomIndex = self.bombs.length - 1;
 
                             self.physics.add.collider(self.player, bomb, function() {
-                                if (!self.playerInvincible) {
-                                    self.playerHealth--;
-
-                                    self.sndHurt.play();
-
-                                    if (self.playerHealth >= 0) {
-                                        self.hearts[self.playerHealth].setVisible(false);
-                                    }
-                                }
+                                self.inflictPlayer();
 
                                 self.removeBomb(bomIndex);
                             });
@@ -597,15 +581,7 @@ class HortusGame extends Phaser.Scene {
 
             self.spike.collided = true;
 
-            if (!self.playerInvincible) {
-                self.playerHealth--;
-
-                self.sndHurt.play();
-
-                if (self.playerHealth >= 0) {
-                    self.hearts[self.playerHealth].setVisible(false);
-                }
-            }
+            self.inflictPlayer();
         });
 
         self.sndSpike.loop = true;
@@ -670,6 +646,19 @@ class HortusGame extends Phaser.Scene {
         this.obstacles = [];
         this.bees = [];
         this.bombs = [];
+    }
+
+    inflictPlayer()
+    {
+        if (!this.playerInvincible) {
+            this.playerHealth--;
+
+            this.sndHurt.play();
+
+            if (this.playerHealth >= 0) {
+                this.hearts[this.playerHealth].setVisible(false);
+            }
+        }
     }
 
     finishGame()
