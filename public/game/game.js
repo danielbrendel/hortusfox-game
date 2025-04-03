@@ -2,6 +2,7 @@ const PLAYER_MAX_HEALTH = 3;
 const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
 const INVINC_MAXRAND = 10;
+const BOMB_MAXRAND = 10;
 
 class HortusGame extends Phaser.Scene {
     preload()
@@ -27,13 +28,17 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('boom', 'game/assets/sprites/explosion.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('puff', 'game/assets/sprites/puff.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('star', 'game/assets/sprites/star.png', { frameWidth: 64, frameHeight: 60 });
+        this.load.spritesheet('bluebomb', 'game/assets/sprites/bluebomb.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('detonation', 'game/assets/sprites/detonation.png', { frameWidth: 192, frameHeight: 192 });
 
         this.load.audio('theme', 'game/assets/sounds/theme.ogg');
         this.load.audio('invincible', 'game/assets/sounds/invincible.wav');
         this.load.audio('jump', 'game/assets/sounds/jump.wav');
         this.load.audio('hurt', 'game/assets/sounds/hurt.wav');
         this.load.audio('explosion', 'game/assets/sounds/explosion.wav');
+        this.load.audio('detonation', 'game/assets/sounds/detonation.wav');
         this.load.audio('up', 'game/assets/sounds/up.wav');
+        this.load.audio('fuse', 'game/assets/sounds/fuse.wav');
 
         this.load.audio('monster_spawn', 'game/assets/sounds/monster_spawn.wav');
         this.load.audio('monster_shoot', 'game/assets/sounds/monster_shoot.wav');
@@ -145,6 +150,20 @@ class HortusGame extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'detonation',
+            frames: this.anims.generateFrameNumbers('detonation', { start: 0, end: 15 }),
+            frameRate: 25,
+            repeat: 0
+        });
+
+        this.anims.create({
+            key: 'fuse',
+            frames: this.anims.generateFrameNumbers('bluebomb', { start: 0, end: 14 }),
+            frameRate: 10,
+            repeat: 0
+        });
+
+        this.anims.create({
             key: 'puff',
             frames: this.anims.generateFrameNumbers('puff', { start: 0, end: 9 }),
             frameRate: 50,
@@ -213,6 +232,8 @@ class HortusGame extends Phaser.Scene {
         this.sndJump = this.sound.add('jump');
         this.sndHurt = this.sound.add('hurt');
         this.sndExplosion = this.sound.add('explosion');
+        this.sndDetonation = this.sound.add('detonation');
+        this.sndFuse = this.sound.add('fuse');
         this.sndUp = this.sound.add('up');
         this.sndMonsterSpawn = this.sound.add('monster_spawn');
         this.sndMonsterShoot = this.sound.add('monster_shoot');
@@ -360,8 +381,7 @@ class HortusGame extends Phaser.Scene {
             self.sndMonsterDispose.play();
 
             self.spawnExplosion(box.x, box.y);
-            self.checkSupplySpawn(box.x, box.y);
-            self.checkInvicibleSpawn(box.x, box.y);
+            self.checkItemSpawn(box.x, box.y);
 
             if (typeof self.obstacles[obstIndex] !== 'undefined') {
                 self.removeObstacle(obstIndex, true);
@@ -487,8 +507,7 @@ class HortusGame extends Phaser.Scene {
             self.sndMonsterDispose.play();
 
             self.spawnExplosion(bee.x, bee.y);
-            self.checkSupplySpawn(bee.x, bee.y);
-            self.checkInvicibleSpawn(bee.x, bee.y);
+            self.checkItemSpawn(bee.x, bee.y);
 
             if (typeof self.bees[beeIndex] !== 'undefined') {
                 self.removeBee(beeIndex, true);
@@ -709,6 +728,13 @@ class HortusGame extends Phaser.Scene {
         this.trees.push(tree);
     }
 
+    checkItemSpawn(x, y)
+    {
+        this.checkSupplySpawn(x, y);
+        this.checkInvicibleSpawn(x, y);
+        this.checkBombSpawn(x, y);
+    }
+
     checkSupplySpawn(x, y)
     {
         if (this.playerHealth < PLAYER_MAX_HEALTH) {
@@ -805,6 +831,61 @@ class HortusGame extends Phaser.Scene {
             });
 
             item.destroy();
+        });
+    }
+
+    checkBombSpawn(x, y)
+    {
+        let rndSpawnItem = Phaser.Math.Between(1, BOMB_MAXRAND);
+        if (rndSpawnItem === BOMB_MAXRAND) {
+            this.spawnBombItem(x, y);
+        }
+    }
+
+    spawnBombItem(x, y)
+    {
+        let self = this;
+
+        let item = this.physics.add.sprite(x, y, 'bluebomb');
+
+        item.setGravityY(200);
+        item.setGravityX(Phaser.Math.Between(-100, 100));
+        item.setCollideWorldBounds(true);
+        item.setBounce(0.5, 0.5);
+
+        this.sndFuse.play();
+
+        item.anims.play('fuse', true);
+        item.on('animationcomplete', function() {
+            item.destroy();
+
+            let detonation = self.physics.add.sprite(item.x, item.y, 'detonation');
+            detonation.setScale(4.0, 4.0);
+            detonation.anims.play('detonation', true);
+            detonation.on('animationcomplete', function() {
+                detonation.destroy();
+            });
+
+            for (let i = 0; i < self.obstacles.length; i++) {
+                self.physics.add.collider(detonation, self.obstacles[i].plant, function() {
+                    self.spawnExplosion(self.obstacles[i].plant.x, self.obstacles[i].plant.y);
+                    self.removeObstacle(i, true);
+                });
+
+                self.physics.add.collider(detonation, self.obstacles[i].box, function() {
+                    self.spawnExplosion(self.obstacles[i].box.x, self.obstacles[i].box.y);
+                    self.removeObstacle(i, true);
+                });
+            }
+
+            for (let i = 0; i < self.bees.length; i++) {
+                self.physics.add.collider(detonation, self.bees[i].bee, function() {
+                    self.spawnExplosion(self.bees[i].bee.x, self.bees[i].bee.y);
+                    self.removeBee(i, true);
+                });
+            }
+
+            self.sndDetonation.play();
         });
     }
 

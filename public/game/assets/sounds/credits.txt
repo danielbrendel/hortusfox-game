@@ -1,2 +1,5 @@
 theme: Metaruka (https://opengameart.org/content/game-game)
 jump: bart (https://opengameart.org/content/8-bit-platformer-sfx)
+Fuse: themightyglider (https://opengameart.org/content/simple-fuse-sound)
+Explosion: Stephen M. Cameron (https://opengameart.org/content/action-shooter-soundset-wwvi)
+Detonation: Iwan Gabovitch (https://opengameart.org/content/synthesized-explosion)
