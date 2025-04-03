@@ -952,11 +952,13 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.obstacles[i].plant, function() {
                     self.spawnExplosion(self.obstacles[i].plant.x, self.obstacles[i].plant.y);
                     self.removeObstacle(i, true);
+                    self.playerScore++;
                 });
 
                 self.physics.add.collider(detonation, self.obstacles[i].box, function() {
                     self.spawnExplosion(self.obstacles[i].box.x, self.obstacles[i].box.y);
                     self.removeObstacle(i, true);
+                    self.playerScore++;
                 });
             }
 
@@ -964,6 +966,7 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.bees[i].bee, function() {
                     self.spawnExplosion(self.bees[i].bee.x, self.bees[i].bee.y);
                     self.removeBee(i, true);
+                    self.playerScore++;
                 });
             }
 
@@ -975,6 +978,8 @@ class HortusGame extends Phaser.Scene {
 
                     self.spike.sprite.destroy();
                     self.spike = null;
+
+                    self.playerScore++;
                 });
             }
 
