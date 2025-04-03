@@ -862,18 +862,30 @@ class HortusGame extends Phaser.Scene {
     {
         let self = this;
 
-        let item = this.physics.add.sprite(x, y, 'star');
+        let item = this.physics.add.sprite(x, y - 100, 'star');
 
         item.setGravityY(200);
         item.setGravityX(Phaser.Math.Between(-100, 100));
+        item.setScale(0.5, 0.5);
         item.setCollideWorldBounds(true);
-        item.setBounce(0.5, 0.5);
+        item.setBounce(0.5, 1.0);
+
+        let glow = item.preFX.addGlow();
+
+        let tween = this.tweens.add({
+            targets: glow,
+            outerStrength: 20,
+            yoyo: true,
+            loop: -1,
+            ease: 'sine.inout'
+        });
 
         self.time.addEvent({
             delay: 5000,
             loop: false,
             callback: function() {
                 self.spawnPuff(item.x, item.y);
+                tween.remove();
                 item.destroy();
             },
             callbackScope: self
@@ -899,6 +911,7 @@ class HortusGame extends Phaser.Scene {
                 callbackScope: self
             });
 
+            tween.remove();
             item.destroy();
         });
     }
