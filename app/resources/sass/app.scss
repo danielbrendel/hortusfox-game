@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Jersey+10&display=swap');
+
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    overflow-y: hidden;
+    background-color: rgb(0, 0, 0);
+}
+
+.startmenu {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    margin: 0 auto;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.startmenu-overlay {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.startmenu-inner {
+    position: relative;
+    width: 45%;
+    @media screen and (max-width: 768px) {
+        width: 85%;
+        font-size: 1.5em;
+        padding-left: 20px;
+        padding-right: 20px;
+    }
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -55%);
+    font-family: "Jersey 10", sans-serif;
+    font-size: 2.0em;
+    text-align: center;
+    color: rgb(200, 200, 200);
+}
+
+.startmenu-title {
+    position: relative;
+    margin-bottom: 81px;
+}
+
+.startmenu-title h1 {
+    font-size: 2.5em;
+    margin-bottom: -30px;
+    color: rgb(50, 195, 125);
+}
+
+.startmenu-title h2 {
+    font-size: 1.5em;
+    color: rgb(240, 240, 240);
+}
+
+.startmenu-actions {
+    margin-bottom: 79px;
+}
+
+a.button {
+    padding-top: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 10px;
+    border-radius: 5px;
+    text-decoration: none;
+    color: rgb(250, 250, 250);
+}
+
+a.button:hover {
+    text-decoration: none;
+}
+
+.button-start {
+    background-color: rgb(32, 179, 111);
+}
+
+.button-start:hover {
+    background-color: rgb(50, 195, 125);
+}
+
+.startmenu-info {
+    font-size: 1.0em;
+    color: rgb(200, 200, 200);
+}
+
+.startmenu-info a {
+    color: rgb(230, 232, 85);
+    text-decoration: none;
+}
+
+.startmenu-info a:hover {
+    text-decoration: underline;
+}
+
+.startmenu-links {
+    position: relative;
+    margin-top: 63px;
+}
+
+.startmenu-links-item {
+    position: relative;
+    display: inline-block;
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+.startmenu-links-item i {
+    color: rgb(0, 0, 0);
+}
+
+.startmenu-links-item i.fa-github {
+    color: rgb(20, 20, 20);
+}
+
+.startmenu-links-item i.fa-discord {
+    color: rgb(153, 140, 222);
+}
+
+.startmenu-links-item i.fa-youtube {
+    color: rgb(202, 43, 43);
+}
+
+.startmenu-links-item i.fa-video {
+    color: rgb(255, 150, 55);
+}
+
+.startmenu-links-item i.fa-mastodon {
+    color: rgb(123, 143, 230);
+}
+
+.startmenu-links-item i.fa-camera {
+    color: rgb(215, 212, 0);
+}
+
+.action-go-back {
+    position: fixed;
+    z-index: 5;
+    top: 10px;
+    left: 10px;
+}
+
+.action-go-back-inner {
+    padding-top: 10px;
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-bottom: 10px;
+    background-color: rgb(80, 80, 80);
+    border-radius: 50%;
+}
+
+.action-go-back-inner a {
+    color: rgb(200, 200, 200);
+}
+
+.action-go-back-inner a:hover {
+    color: rgb(230, 230, 230);
+}

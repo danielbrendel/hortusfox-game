@@ -1,0 +1,5 @@
+sky: bart (https://opengameart.org/content/sky-backdrop)
+heart: Flixberry Entertainment (https://opengameart.org/content/heart-pixel-art)
+clouds: thomaswp (https://opengameart.org/content/tiling-background-pack-horizon)
+trees, shrooms, flower, bush: Julien (https://opengameart.org/content/forest-themed-sprites)
+explosion: JoesAlotofthings (https://opengameart.org/content/alot-of-particles-flashburst-special-effect-alotofparticles15)
