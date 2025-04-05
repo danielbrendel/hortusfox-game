@@ -1219,8 +1219,11 @@ class HortusGame extends Phaser.Scene {
             delay: 5000,
             loop: false,
             callback: function() {
-                self.spawnPuff(supply.x, supply.y);
-                supply.destroy();
+                if (supply) {
+                    self.spawnPuff(supply.x, supply.y);
+                    supply.destroy();
+                    supply = null;
+                }
             },
             callbackScope: self
         });
@@ -1235,6 +1238,7 @@ class HortusGame extends Phaser.Scene {
             }
 
             supply.destroy();
+            supply = null;
         });
     }
 
@@ -1252,15 +1256,15 @@ class HortusGame extends Phaser.Scene {
     {
         let self = this;
 
-        let item = this.physics.add.sprite(x, y - 100, 'star');
+        let invinc = this.physics.add.sprite(x, y - 100, 'star');
 
-        item.setGravityY(200);
-        item.setGravityX(Phaser.Math.Between(-100, 100));
-        item.setScale(0.5, 0.5);
-        item.setCollideWorldBounds(true);
-        item.setBounce(0.5, 1.0);
+        invinc.setGravityY(200);
+        invinc.setGravityX(Phaser.Math.Between(-100, 100));
+        invinc.setScale(0.5, 0.5);
+        invinc.setCollideWorldBounds(true);
+        invinc.setBounce(0.5, 1.0);
 
-        let glow = item.preFX.addGlow();
+        let glow = invinc.preFX.addGlow();
 
         let tween = this.tweens.add({
             targets: glow,
@@ -1274,16 +1278,19 @@ class HortusGame extends Phaser.Scene {
             delay: 5000,
             loop: false,
             callback: function() {
-                self.spawnPuff(item.x, item.y);
-                tween.remove();
-                item.destroy();
+                if (invinc) {
+                    self.spawnPuff(invinc.x, invinc.y);
+                    tween.remove();
+                    invinc.destroy();
+                    invinc = null;
+                }
             },
             callbackScope: self
         });
 
-        this.physics.add.collider(item, this.platforms);
+        this.physics.add.collider(invinc, this.platforms);
 
-        this.physics.add.collider(this.player, item, function() {
+        this.physics.add.collider(this.player, invinc, function() {
             self.playerInvincible = true;
             self.playerGlow.active = true;
             self.sndTheme.pause();
@@ -1302,7 +1309,8 @@ class HortusGame extends Phaser.Scene {
             });
 
             tween.remove();
-            item.destroy();
+            invinc.destroy();
+            invinc = null;
         });
     }
 
@@ -1358,6 +1366,22 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.bees[i].bee, function() {
                     self.spawnExplosion(self.bees[i].bee.x, self.bees[i].bee.y);
                     self.removeBee(i, true);
+                    self.playerScore++;
+                });
+            }
+
+            for (let i = 0; i < self.skulls.length; i++) {
+                self.physics.add.collider(detonation, self.skulls[i].skull, function() {
+                    self.spawnExplosion(self.skulls[i].skull.x, self.skulls[i].skull.y);
+                    self.removeSkull(i, true);
+                    self.playerScore++;
+                });
+            }
+
+            for (let i = 0; i < self.electros.length; i++) {
+                self.physics.add.collider(detonation, self.electros[i].electro, function() {
+                    self.spawnExplosion(self.electros[i].electro.x, self.electros[i].electro.y);
+                    self.removeElectro(i, true);
                     self.playerScore++;
                 });
             }
