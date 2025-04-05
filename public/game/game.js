@@ -307,8 +307,10 @@ class HortusGame extends Phaser.Scene {
             self.restartGame();
         }).on('pointerover', function() {
             self.btnRestart.setStyle({ color: 'rgb(255, 255, 255)', fontSize: '20px' });
+            document.body.style.cursor = 'pointer';
         }).on('pointerout', function() {
             self.btnRestart.setStyle({ color: 'rgb(0, 100, 150)', fontSize: '20px' });
+            document.body.style.cursor = '';
         }).setVisible(false);
 
         this.sndTheme = this.sound.add('theme');
