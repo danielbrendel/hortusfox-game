@@ -3,6 +3,11 @@ const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
 const INVINC_MAXRAND = 15;
 const BOMB_MAXRAND = 10;
+const MONSTER_PLANT_SCORE = 1;
+const MONSTER_BEE_SCORE = 3;
+const MONSTER_SKULL_SCORE = 1;
+const MONSTER_ELECTRO_SCORE = 4;
+const MONSTER_SPIKE_SCORE = 5;
 
 class HortusGame extends Phaser.Scene {
     preload()
@@ -464,7 +469,7 @@ class HortusGame extends Phaser.Scene {
         let obstIndex = this.obstacles.length - 1;
 
         this.physics.add.collider(this.player, box, function() {
-            self.playerScore++;
+            self.playerScore += MONSTER_PLANT_SCORE;
 
             self.sndMonsterDispose.play();
 
@@ -582,7 +587,7 @@ class HortusGame extends Phaser.Scene {
         let beeIndex = this.bees.length - 1;
 
         this.physics.add.collider(this.player, bee, function() {
-            self.playerScore += 5;
+            self.playerScore += MONSTER_BEE_SCORE;
 
             self.sndMonsterDispose.play();
 
@@ -687,7 +692,7 @@ class HortusGame extends Phaser.Scene {
         let skullIndex = this.skulls.length - 1;
 
         this.physics.add.collider(this.player, skull, function() {
-            self.playerScore += 2;
+            self.playerScore += MONSTER_SKULL_SCORE;
 
             self.sndMonsterDispose.play();
 
@@ -798,7 +803,7 @@ class HortusGame extends Phaser.Scene {
         let electroIndex = this.electros.length - 1;
 
         this.physics.add.collider(this.player, electro, function() {
-            self.playerScore += 2;
+            self.playerScore += MONSTER_ELECTRO_SCORE;
 
             self.sndMonsterDispose.play();
 
@@ -1354,13 +1359,12 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.obstacles[i].plant, function() {
                     self.spawnExplosion(self.obstacles[i].plant.x, self.obstacles[i].plant.y);
                     self.removeObstacle(i, true);
-                    self.playerScore++;
+                    self.playerScore += MONSTER_PLANT_SCORE;
                 });
 
                 self.physics.add.collider(detonation, self.obstacles[i].box, function() {
                     self.spawnExplosion(self.obstacles[i].box.x, self.obstacles[i].box.y);
                     self.removeObstacle(i, true);
-                    self.playerScore++;
                 });
             }
 
@@ -1368,7 +1372,7 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.bees[i].bee, function() {
                     self.spawnExplosion(self.bees[i].bee.x, self.bees[i].bee.y);
                     self.removeBee(i, true);
-                    self.playerScore++;
+                    self.playerScore += MONSTER_BEE_SCORE;
                 });
             }
 
@@ -1376,7 +1380,7 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.skulls[i].skull, function() {
                     self.spawnExplosion(self.skulls[i].skull.x, self.skulls[i].skull.y);
                     self.removeSkull(i, true);
-                    self.playerScore++;
+                    self.playerScore += MONSTER_SKULL_SCORE;
                 });
             }
 
@@ -1384,7 +1388,7 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.electros[i].electro, function() {
                     self.spawnExplosion(self.electros[i].electro.x, self.electros[i].electro.y);
                     self.removeElectro(i, true);
-                    self.playerScore++;
+                    self.playerScore += MONSTER_ELECTRO_SCORE;
                 });
             }
 
@@ -1397,7 +1401,7 @@ class HortusGame extends Phaser.Scene {
                     self.spike.sprite.destroy();
                     self.spike = null;
 
-                    self.playerScore++;
+                    self.playerScore += MONSTER_SPIKE_SCORE;
                 });
             }
 
