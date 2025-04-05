@@ -6,3 +6,4 @@ explosion, detonation: JoesAlotofthings (https://opengameart.org/content/alot-of
 bluebomb: Amon (https://opengameart.org/content/animated-bomb)
 Enemies: Bevouliin (https://opengameart.org/content/bevouliin-horns-skull-sprite-sheets)
 Bolt: oglsdl (https://opengameart.org/content/lightning-1)
+Particle: JoesAlotofthings (https://opengameart.org/content/alotofimpacts-6-frame-impacts-4-additional-variations)

@@ -39,6 +39,7 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('boom', 'game/assets/sprites/explosion.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('puff', 'game/assets/sprites/puff.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('star', 'game/assets/sprites/star.png', { frameWidth: 64, frameHeight: 60 });
+        this.load.spritesheet('particle', 'game/assets/sprites/particle.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('bluebomb', 'game/assets/sprites/bluebomb.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('detonation', 'game/assets/sprites/detonation.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('rocket', 'game/assets/sprites/rocket.png', { frameWidth: 128, frameHeight: 128 });
@@ -1282,23 +1283,27 @@ class HortusGame extends Phaser.Scene {
         invinc.setCollideWorldBounds(true);
         invinc.setBounce(0.5, 1.0);
 
-        let glow = invinc.preFX.addGlow();
-
-        let tween = this.tweens.add({
-            targets: glow,
-            outerStrength: 20,
-            yoyo: true,
-            loop: -1,
-            ease: 'sine.inout'
+        let emitter = this.add.particles(invinc.x, invinc.y, 'particle', {
+            speed: 100,
+            lifespan: 3000,
+            frequency: 100,
+            quantity: 1,
+            gravityY: 200
         });
+
+        let interval = setInterval(function() {
+            emitter.x = invinc.x;
+            emitter.y = invinc.y;
+        }, 10);
 
         self.time.addEvent({
             delay: 5000,
             loop: false,
             callback: function() {
                 if (invinc) {
+                    clearInterval(interval);
+                    emitter.destroy();
                     self.spawnPuff(invinc.x, invinc.y);
-                    tween.remove();
                     invinc.destroy();
                     invinc = null;
                 }
@@ -1314,10 +1319,26 @@ class HortusGame extends Phaser.Scene {
             self.sndTheme.pause();
             self.sndInvicible.play();
 
+            let rect = self.add.graphics({ fillStyle: { color: Phaser.Display.Color.RGBStringToColor('rgb(255, 243, 72)').color }}).setAlpha(0.0);
+            let covscreen = new Phaser.Geom.Rectangle(0, 0, gameconfig.scale.width, gameconfig.scale.height);
+            rect.fillRectShape(covscreen);
+
+            self.tweens.add({
+                targets: rect,
+                alpha: 0.3
+            });
+
             self.time.addEvent({
                 delay: 15000,
                 loop: false,
                 callback: function() {
+                    self.tweens.add({
+                        targets: rect,
+                        alpha: 0.0,
+                        onComplete: function () {
+                            rect.destroy();
+                        }
+                    });
                     self.playerInvincible = false;
                     self.playerGlow.active = false;
                     self.sndInvicible.stop();
@@ -1326,7 +1347,9 @@ class HortusGame extends Phaser.Scene {
                 callbackScope: self
             });
 
-            tween.remove();
+            clearInterval(interval);
+            emitter.destroy();
+
             invinc.destroy();
             invinc = null;
         });
