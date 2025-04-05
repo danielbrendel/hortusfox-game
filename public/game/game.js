@@ -24,7 +24,9 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('plant', 'game/assets/sprites/plant.png', { frameWidth: 376, frameHeight: 500 });
         this.load.spritesheet('bomb', 'game/assets/sprites/bomb.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('laser', 'game/assets/sprites/laser.png', { frameWidth: 123, frameHeight: 119 });
+        this.load.spritesheet('phaser', 'game/assets/sprites/phaser.png', { frameWidth: 99, frameHeight: 60 });
         this.load.spritesheet('bee', 'game/assets/sprites/bee.png', { frameWidth: 712, frameHeight: 520});
+        this.load.spritesheet('skull', 'game/assets/sprites/skull.png', { frameWidth: 512, frameHeight: 554 });
         this.load.spritesheet('spike', 'game/assets/sprites/spike.png', { frameWidth: 364, frameHeight: 202 });
         this.load.spritesheet('boom', 'game/assets/sprites/explosion.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('puff', 'game/assets/sprites/puff.png', { frameWidth: 32, frameHeight: 32 });
@@ -56,9 +58,11 @@ class HortusGame extends Phaser.Scene {
         this.trees = [];
         this.obstacles = [];
         this.bees = [];
+        this.skulls = [];
         this.spike = null;
         this.bombs = [];
         this.lasers = [];
+        this.phasers = [];
         this.hearts = [];
         this.playerScore = 0;
         this.playerHealth = PLAYER_MAX_HEALTH;
@@ -70,6 +74,10 @@ class HortusGame extends Phaser.Scene {
         this.tmSpawnBeesSpeed = {
             min: 5000,
             max: 7500
+        };
+        this.tmSpawnSkullSpeed = {
+            min: 2000,
+            max: 5000
         };
         this.tmSpawnSpikeSpeed = {
             min: 15000,
@@ -150,6 +158,13 @@ class HortusGame extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'jaw',
+            frames: this.anims.generateFrameNumbers('skull', { start: 0, end: 1 }),
+            frameRate: 10,
+            repeat: -1
+        });
+
+        this.anims.create({
             key: 'boom',
             frames: this.anims.generateFrameNumbers('boom', { start: 0, end: 15 }),
             frameRate: 25,
@@ -205,6 +220,25 @@ class HortusGame extends Phaser.Scene {
             callbackScope: self
         });
 
+        this.skullTmrConfig = {
+            delay: Phaser.Math.Between(self.tmSpawnSkullSpeed.min, self.tmSpawnSkullSpeed.max),
+            loop: true,
+            callback: self.spawnEnemySkull,
+            callbackScope: self
+        };
+
+        this.skullTimer = this.time.addEvent(this.skullTmrConfig);
+
+        this.bCanSpawnSkulls = false;
+        this.startSpawningSkulls = this.time.addEvent({
+            delay: 15000,
+            loop: false,
+            callback: function() {
+                this.bCanSpawnSkulls = true;
+            },
+            callbackScope: self
+        });
+
         this.spikeTmrConfig = {
             delay: Phaser.Math.Between(self.tmSpawnSpikeSpeed.min, self.tmSpawnSpikeSpeed.max),
             loop: true,
@@ -254,6 +288,7 @@ class HortusGame extends Phaser.Scene {
         this.sndMonsterShoot = this.sound.add('monster_shoot');
         this.sndMonsterDispose = this.sound.add('monster_dispose');
         this.sndBeeSpawn = this.sound.add('bee_spawn');
+        this.sndSkullSpawn = this.sound.add('monster_spawn');
         this.sndSpike = this.sound.add('spike');
 
         this.children.bringToTop(this.txtScore);
@@ -316,6 +351,7 @@ class HortusGame extends Phaser.Scene {
 
         this.updateObstacles();
         this.updateBees();
+        this.updateSkulls();
         this.updateBombs();
         this.updateSpike();
 
@@ -547,6 +583,111 @@ class HortusGame extends Phaser.Scene {
         }
     }
 
+    spawnEnemySkull()
+    {
+        if ((this.playerHealth <= 0) || (!this.bCanSpawnSkulls)) {
+            return;
+        }
+
+        let self = this;
+
+        let posx = gameconfig.scale.width - 20;
+        let posy = Phaser.Math.Between(150, gameconfig.scale.height - 100);
+
+        let skull = this.physics.add.sprite(posx, posy, 'skull').setScale(0.2).refreshBody();
+
+        let ident = 'skull_' + Math.random().toString(16).slice(2);
+
+        this.skulls.push({
+            ident: ident,
+            skull: skull,
+            speed: Phaser.Math.Between(1, 4),
+            destruction: false,
+            shoot: self.time.addEvent({
+                delay: Phaser.Math.Between(1000, 2500),
+                loop: true,
+                callback: function() {
+                    if (self.playerHealth <= 0) {
+                        return;
+                    }
+
+                    let phaser = self.physics.add.sprite(skull.x - 20, skull.y, 'phaser');  
+                    phaser.setVelocity(Phaser.Math.Between(300, 550) * -1, 0);
+                    
+                    self.phasers.push({
+                        phaser: phaser,
+                        target: {
+                            x: self.player.x,
+                            y: self.player.y
+                        },
+                        destruction: false,
+                        parent: ident,
+                        tStart: Date.now(),
+                        tNow: Date.now(),
+                        tLifeTime: 10000
+                    });
+
+                    let phasIndex = self.phasers.length - 1;
+
+                    self.physics.add.collider(self.player, phaser, function() {
+                        self.inflictPlayer();
+
+                        self.removePhaser(phasIndex);
+                    });
+
+                    self.sndMonsterShoot.play();
+                },
+                callbackScope: self
+            })
+        });
+
+        let skullIndex = this.skulls.length - 1;
+
+        this.physics.add.collider(this.player, skull, function() {
+            self.playerScore += 2;
+
+            self.sndMonsterDispose.play();
+
+            self.spawnExplosion(skull.x, skull.y);
+            self.checkItemSpawn(skull.x, skull.y);
+
+            if (typeof self.skulls[skullIndex] !== 'undefined') {
+                self.removeSkull(skullIndex, true);
+            }
+        });
+
+        this.sndSkullSpawn.play();
+    }
+
+    updateSkulls()
+    {
+        for (let i = 0; i < this.skulls.length; i++) {
+            if (!this.skulls[i].destruction) {
+                this.skulls[i].skull.x -= this.skulls[i].speed;
+
+                this.skulls[i].skull.anims.play('jaw', true);
+
+                if (this.skulls[i].skull.x <= -50) {
+                    this.removeSkull(i, true);
+                }
+            }
+        }
+    }
+
+    updatePhasers()
+    {
+        for (let i = 0; i < this.phasers.length; i++) {
+            if (!this.phasers[i].destruction) {
+                this.phasers[i].tNow = Date.now();
+                if (this.phasers[i].tNow > this.phasers[i].tStart + this.phasers[i].tLifeTime) {
+                    this.removePhaser(i);
+
+                    continue;
+                }
+            }
+        }
+    }
+
     spawnEnemySpike()
     {
         if ((this.playerHealth <= 0) || (this.spike)) {
@@ -758,6 +899,29 @@ class HortusGame extends Phaser.Scene {
         }
     }
 
+    removeSkull(index, withPhaser = false)
+    {
+        if (!this.skulls[index].destruction) {
+            let parentIdent = this.skulls[index].ident;
+            this.skulls[index].shoot.paused = true;
+            this.skulls[index].destruction = true;
+
+            if (withPhaser) {
+                for (let i = 0; i < this.phasers.length; i++) {
+                    if (!this.phasers[i].destruction) {
+                        if (this.phasers[i].parent === parentIdent) {
+                            this.removePhaser(i);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            this.skulls[index].skull.destroy();
+            this.skulls.slice(index, 1);
+        }
+    }
+
     removeLaser(index)
     {
         if (!this.lasers[index].destruction) {
@@ -773,6 +937,15 @@ class HortusGame extends Phaser.Scene {
             this.bombs[index].destruction = true;
             this.bombs[index].bomb.destroy();
             this.bees.slice(index, 1);
+        }
+    }
+
+    removePhaser(index)
+    {
+        if (!this.phasers[index].destruction) {
+            this.phasers[index].destruction = true;
+            this.phasers[index].phaser.destroy();
+            this.skulls.slice(index, 1);
         }
     }
 
