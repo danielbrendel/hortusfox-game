@@ -1,0 +1,14 @@
+{
+    "name": "HortusFox Freegame",
+    "short_name": "HortusFox Freegame",
+    "icons": [{
+        "src": "img/logo.png",
+        "sizes": "256x256",
+        "type": "image/png"
+    }],
+    "start_url": "/",
+    "display": "fullscreen",
+    "orientation": "any",
+    "background_color": "#323232",
+    "theme_color": "#323232"
+}

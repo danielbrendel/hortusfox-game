@@ -6,6 +6,8 @@
         
         <title>{{ env('APP_NAME') }}</title>
 
+        <link rel="manifest" href="{{ asset('manifest.json') }}"/>
+
         <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}"/>
 
         <script src="{{ asset('js/fontawesome.js') }}"></script>
@@ -15,5 +17,19 @@
 
     <body>
         {%content%}
+
+        <script>
+            window.onload = function() {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('./serviceworker.js', { scope: '/' })
+                        .then(function(registration){
+                            window.serviceWorkerEnabled = true;
+                        }).catch(function(err){
+                            window.serviceWorkerEnabled = false;
+                            console.error(err);
+                        });
+                }
+            };
+        </script>
     </body>
 </html>

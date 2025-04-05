@@ -9,6 +9,12 @@
 @endif
 
 <script>
+    if ((screen.orientation) && (screen.orientation.lock)) {
+        screen.orientation.lock('landscape').catch((err) => {
+            console.error('Failed to lock orientation to landscape: ', err);
+        });
+    }
+
     window.startGame = () => {
         gameconfig.physics.arcade.debug = {{ env('APP_DEBUG') ? 'true' : 'false' }};
         const game = new Phaser.Game(gameconfig);
