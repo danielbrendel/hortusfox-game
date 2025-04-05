@@ -479,7 +479,7 @@ class HortusGame extends Phaser.Scene {
         let self = this;
 
         let posx = gameconfig.scale.width - 20;
-        let posy = Phaser.Math.Between(10, 200);
+        let posy = Phaser.Math.Between(50, 250);
 
         let bee = this.physics.add.sprite(posx, posy, 'bee').setScale(0.2).refreshBody();
 
