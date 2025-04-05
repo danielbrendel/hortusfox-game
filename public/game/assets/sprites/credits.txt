@@ -4,4 +4,4 @@ clouds: thomaswp (https://opengameart.org/content/tiling-background-pack-horizon
 trees, shrooms, flower, bush: Julien (https://opengameart.org/content/forest-themed-sprites)
 explosion, detonation: JoesAlotofthings (https://opengameart.org/content/alot-of-particles-flashburst-special-effect-alotofparticles15)
 bluebomb: Amon (https://opengameart.org/content/animated-bomb)
-Skull: Bevouliin (https://opengameart.org/content/bevouliin-horns-skull-sprite-sheets)
+Enemies: Bevouliin (https://opengameart.org/content/bevouliin-horns-skull-sprite-sheets)
