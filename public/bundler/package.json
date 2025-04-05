@@ -1,0 +1,24 @@
+{
+    "name": "hortusfox-game-bundler",
+    "version": "1.0.0",
+    "description": "A free mini-game under the HortusFox umbrella",
+    "author": "Daniel Brendel",
+    "main": "src/main.js",
+    "build": {
+        "appId": "com.hortusfox.freegame",
+        "productName": "HortusFox Freegame",
+        "icon": "game/logo"
+    },
+    "scripts": {
+        "start": "electron .",
+        "build-windows": "electron-builder --win=portable --x64",
+        "build-linux": "electron-builder --linux --arm64",
+        "build-macos": "electron-builder --mac"
+    },
+    "devDependencies": {
+        "electron": "^35.0.0",
+        "electron-builder": "^24.6.3"
+    },
+    "dependencies": {
+    }
+}

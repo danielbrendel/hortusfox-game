@@ -5,13 +5,14 @@
  */
 class GameBuild {
     /**
+     * @param $bundle
      * @param $debug
      * @return void
      */
-    public static function make($debug = false)
+    public static function make($bundle = 'html5', $debug = false)
     {
         $build_type = ($debug) ? 'Debug' : 'Release';
-        echo "Building game (Build type: {$build_type})...\n";
+        echo "Building game (Platform: {$bundle}, Build type: {$build_type})...\n";
 
         $_SERVER['SERVER_PORT'] = 80;
         $_SERVER['SERVER_NAME'] = 'localhost';
@@ -70,37 +71,87 @@ class GameBuild {
             file_put_contents(public_path() . '/build/version.json', json_encode($build_info));
         }
 
-        echo "Packaging...\n";
-
-        $package_name = 'game_build_' . time() . '.zip';
         $root_path = public_path() . '/build';
 
-        $zip = new ZipArchive();
-        $zip->open(public_path() . '/' . $package_name, ZIPARCHIVE::CREATE | ZipArchive::OVERWRITE);
+        $method_name = 'bundle' . ucfirst($bundle);
+        if (method_exists(static::class, $method_name)) {
+            echo "Bundling...\n";
 
-        $files = new RecursiveIteratorIterator(
-            new RecursiveDirectoryIterator($root_path),
-            RecursiveIteratorIterator::LEAVES_ONLY
-        );
-
-        foreach ($files as $file) {
-            if (!$file->isDir()) {
-                $filePath = $file->getRealPath();
-                $relativePath = substr($filePath, strlen($root_path) + 1);
-
-                $zip->addFile($filePath, $relativePath);
+            try {
+                static::$method_name($root_path);
+            } catch (\Exception $e) {
+                echo "[ERROR] Failed to bundle game package\n";
             }
         }
-
-        $zip->close();
-
-        copy(public_path() . '/' . $package_name, public_path() . '/builds/' . $package_name);
 
         echo "Cleaning up...\n";
 
         system('rmdir /S /Q "' . $root_path . '"');
-        unlink(public_path() . '/' . $package_name);
 
         echo "Done!\n";
+    }
+
+    /**
+     * @param $src
+     * @return void
+     * @throws \Exception
+     */
+    public static function bundleHtml5($src)
+    {
+        try {
+            $package_name = 'game_build_' . time() . '.zip';
+    
+            $zip = new ZipArchive();
+            $zip->open(public_path() . '/builds/' . $package_name, ZIPARCHIVE::CREATE | ZipArchive::OVERWRITE);
+    
+            $files = new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($src),
+                RecursiveIteratorIterator::LEAVES_ONLY
+            );
+    
+            foreach ($files as $file) {
+                if (!$file->isDir()) {
+                    $filePath = $file->getRealPath();
+                    $relativePath = substr($filePath, strlen($src) + 1);
+    
+                    $zip->addFile($filePath, $relativePath);
+                }
+            }
+    
+            $zip->close();
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
+    /**
+     * @param $src
+     * @return void
+     * @throws \Exception
+     */
+    public static function bundleWindows($src)
+    {
+        try {
+            system('xcopy "' . $src . '" "' . public_path() . '/bundler/game/" /E /V /I /Y');
+            copy(public_path() . '/img/logo.png', public_path() . '/bundler/game/logo.png');
+
+            $build_config = [
+                'name' => env('APP_NAME'),
+                'icon' => 'game/logo.png',
+                'width' => 1024,
+                'height' => 768
+            ];
+
+            file_put_contents(public_path() . '/bundler/build.json', json_encode($build_config));
+
+            system('cd /d "' . public_path() . '/bundler" && npm run build-windows');
+
+            copy(public_path() . '/bundler/dist/HortusFox Freegame 1.0.0.exe', public_path() . '/builds/game_build_' . time() . '.exe');
+
+            system('rmdir /S /Q "' . public_path() . '/bundler/game"');
+            system('rmdir /S /Q "' . public_path() . '/bundler/dist"');
+        } catch (\Exception $e) {
+            throw $e;
+        }
     }
 }
