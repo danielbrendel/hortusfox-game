@@ -5,3 +5,4 @@ trees, shrooms, flower, bush: Julien (https://opengameart.org/content/forest-the
 explosion, detonation: JoesAlotofthings (https://opengameart.org/content/alot-of-particles-flashburst-special-effect-alotofparticles15)
 bluebomb: Amon (https://opengameart.org/content/animated-bomb)
 Enemies: Bevouliin (https://opengameart.org/content/bevouliin-horns-skull-sprite-sheets)
+Bolt: oglsdl (https://opengameart.org/content/lightning-1)

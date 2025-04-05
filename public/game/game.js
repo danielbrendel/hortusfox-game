@@ -2,7 +2,7 @@ const PLAYER_MAX_HEALTH = 3;
 const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
 const INVINC_MAXRAND = 15;
-const BOMB_MAXRAND = 1;
+const BOMB_MAXRAND = 10;
 
 class HortusGame extends Phaser.Scene {
     preload()
@@ -25,8 +25,10 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('bomb', 'game/assets/sprites/bomb.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('laser', 'game/assets/sprites/laser.png', { frameWidth: 123, frameHeight: 119 });
         this.load.spritesheet('phaser', 'game/assets/sprites/phaser.png', { frameWidth: 99, frameHeight: 60 });
+        this.load.spritesheet('bolt', 'game/assets/sprites/bolt.png', { frameWidth: 32, frameHeight: 256 });
         this.load.spritesheet('bee', 'game/assets/sprites/bee.png', { frameWidth: 712, frameHeight: 520});
         this.load.spritesheet('skull', 'game/assets/sprites/skull.png', { frameWidth: 512, frameHeight: 554 });
+        this.load.spritesheet('electro', 'game/assets/sprites/electro.png', { frameWidth: 343, frameHeight: 430 });
         this.load.spritesheet('spike', 'game/assets/sprites/spike.png', { frameWidth: 364, frameHeight: 202 });
         this.load.spritesheet('boom', 'game/assets/sprites/explosion.png', { frameWidth: 192, frameHeight: 192 });
         this.load.spritesheet('puff', 'game/assets/sprites/puff.png', { frameWidth: 32, frameHeight: 32 });
@@ -42,11 +44,12 @@ class HortusGame extends Phaser.Scene {
         this.load.audio('detonation', 'game/assets/sounds/detonation.wav');
         this.load.audio('up', 'game/assets/sounds/up.wav');
         this.load.audio('fuse', 'game/assets/sounds/fuse.wav');
-
         this.load.audio('monster_spawn', 'game/assets/sounds/monster_spawn.wav');
         this.load.audio('monster_shoot', 'game/assets/sounds/monster_shoot.wav');
         this.load.audio('monster_dispose', 'game/assets/sounds/monster_dispose.wav');
         this.load.audio('bee_spawn', 'game/assets/sounds/bee.wav');
+        this.load.audio('electro_spawn', 'game/assets/sounds/charge.wav');
+        this.load.audio('electro_attack', 'game/assets/sounds/bolt.wav');
         this.load.audio('spike', 'game/assets/sounds/spike.wav');
 
         this.load.image('heart', 'game/assets/sprites/heart.png');
@@ -59,10 +62,12 @@ class HortusGame extends Phaser.Scene {
         this.obstacles = [];
         this.bees = [];
         this.skulls = [];
+        this.electros = [];
         this.spike = null;
         this.bombs = [];
         this.lasers = [];
         this.phasers = [];
+        this.bolts = [];
         this.hearts = [];
         this.playerScore = 0;
         this.playerHealth = PLAYER_MAX_HEALTH;
@@ -78,6 +83,10 @@ class HortusGame extends Phaser.Scene {
         this.tmSpawnSkullSpeed = {
             min: 2000,
             max: 5000
+        };
+        this.tmSpawnElectroSpeed = {
+            min: 15000,
+            max: 25000,
         };
         this.tmSpawnSpikeSpeed = {
             min: 15000,
@@ -186,6 +195,13 @@ class HortusGame extends Phaser.Scene {
         });
 
         this.anims.create({
+            key: 'bolt',
+            frames: this.anims.generateFrameNumbers('bolt', { start: 0, end: 8 }),
+            frameRate: 15,
+            repeat: 0
+        });
+
+        this.anims.create({
             key: 'puff',
             frames: this.anims.generateFrameNumbers('puff', { start: 0, end: 9 }),
             frameRate: 50,
@@ -235,6 +251,25 @@ class HortusGame extends Phaser.Scene {
             loop: false,
             callback: function() {
                 this.bCanSpawnSkulls = true;
+            },
+            callbackScope: self
+        });
+
+        this.electroTmrConfig = {
+            delay: Phaser.Math.Between(self.tmSpawnElectroSpeed.min, self.tmSpawnElectroSpeed.max),
+            loop: true,
+            callback: self.spawnEnemyElectro,
+            callbackScope: self
+        };
+
+        this.electroTimer = this.time.addEvent(this.electroTmrConfig);
+
+        this.bCanSpawnElectros = false;
+        this.startSpawningElectros = this.time.addEvent({
+            delay: 15000,
+            loop: false,
+            callback: function() {
+                this.bCanSpawnElectros = true;
             },
             callbackScope: self
         });
@@ -289,6 +324,8 @@ class HortusGame extends Phaser.Scene {
         this.sndMonsterDispose = this.sound.add('monster_dispose');
         this.sndBeeSpawn = this.sound.add('bee_spawn');
         this.sndSkullSpawn = this.sound.add('monster_spawn');
+        this.sndElectroSpawn = this.sound.add('electro_spawn');
+        this.sndElectroAttack = this.sound.add('electro_attack');
         this.sndSpike = this.sound.add('spike');
 
         this.children.bringToTop(this.txtScore);
@@ -352,7 +389,11 @@ class HortusGame extends Phaser.Scene {
         this.updateObstacles();
         this.updateBees();
         this.updateSkulls();
+        this.updateElectros();
+        this.updateLasers();
+        this.updatePhasers();
         this.updateBombs();
+        this.updateBolts();
         this.updateSpike();
 
         this.txtScore.setText('Score: ' + this.playerScore);
@@ -688,6 +729,132 @@ class HortusGame extends Phaser.Scene {
         }
     }
 
+    spawnEnemyElectro()
+    {
+        if ((this.playerHealth <= 0) || (!this.bCanSpawnElectros)) {
+            return;
+        }
+
+        let self = this;
+
+        let posx = Phaser.Math.Between(300, gameconfig.scale.width - 300);
+        let posy = 0;
+
+        let electro = this.physics.add.sprite(posx, posy, 'electro').setScale(0.4).refreshBody();
+
+        let ident = 'electro_' + Math.random().toString(16).slice(2);
+
+        this.electros.push({
+            ident: ident,
+            electro: electro,
+            speed: 2,
+            reverse: false,
+            destruction: false,
+            shoot: self.time.addEvent({
+                delay: 2000,
+                loop: false,
+                callback: function() {
+                    if (self.playerHealth <= 0) {
+                        return;
+                    }
+
+                    let bolt = self.physics.add.sprite(electro.x - 1, electro.y + 315, 'bolt');
+                    bolt.setScale(1.0, 1.8);  
+                    bolt.setVelocity(0, 0);
+                    
+                    self.bolts.push({
+                        bolt: bolt,
+                        target: {
+                            x: self.player.x,
+                            y: self.player.y
+                        },
+                        destruction: false,
+                        parent: ident,
+                        tStart: Date.now(),
+                        tNow: Date.now(),
+                        tLifeTime: 500
+                    });
+
+                    let boltIndex = self.bolts.length - 1;
+
+                    self.physics.add.collider(self.player, bolt, function() {
+                        self.inflictPlayer();
+
+                        self.removeBolt(boltIndex);
+                    });
+
+                    bolt.anims.play('bolt', true);
+                    bolt.on('animationcomplete', function() {
+                    });
+
+                    self.sndElectroAttack.play();
+                },
+                callbackScope: self
+            })
+        });
+
+        let electroIndex = this.electros.length - 1;
+
+        this.physics.add.collider(this.player, electro, function() {
+            self.playerScore += 2;
+
+            self.sndMonsterDispose.play();
+
+            self.spawnExplosion(electro.x, electro.y);
+            self.checkItemSpawn(electro.x, electro.y);
+
+            if (typeof self.electros[electroIndex] !== 'undefined') {
+                self.removeElectro(electroIndex, true);
+            }
+        });
+
+        self.time.addEvent({
+            delay: 3500,
+            loop: false,
+            callback: function() {
+                if (typeof self.electros[electroIndex] !== 'undefined') {
+                    self.electros[electroIndex].reverse = true;
+                }
+            },
+            callbackScope: self
+        });
+
+        this.sndElectroSpawn.play();
+    }
+
+    updateElectros()
+    {
+        for (let i = 0; i < this.electros.length; i++) {
+            if (!this.electros[i].destruction) {
+                if (!this.electros[i].reverse) {
+                    if (this.electros[i].electro.y <= 150) {
+                        this.electros[i].electro.y += this.electros[i].speed;
+                    }
+                } else {
+                    this.electros[i].electro.y -= this.electros[i].speed;
+
+                    if (this.electros[i].electro.y <= -50) {
+                        this.removeElectro(i);
+                    }
+                }
+            }
+        }
+    }
+
+    updateBolts()
+    {
+        for (let i = 0; i < this.bolts.length; i++) {
+            if (!this.bolts[i].destruction) {
+                this.bolts[i].tNow = Date.now();
+                if (this.bolts[i].tNow > this.bolts[i].tStart + this.bolts[i].tLifeTime) {
+                    this.removeBolt(i);
+
+                    continue;
+                }
+            }
+        }
+    }
+
     spawnEnemySpike()
     {
         if ((this.playerHealth <= 0) || (this.spike)) {
@@ -786,8 +953,24 @@ class HortusGame extends Phaser.Scene {
             }
         }
 
+        for (let l = 0; l < this.skulls.length; l++) {
+            if (!this.skulls[l].destruction) {
+                this.skulls[l].destruction = true;
+                this.skulls[l].skull.destroy();
+            }
+        }
+
+        for (let m = 0; m < this.electros.length; m++) {
+            if (!this.electros[m].destruction) {
+                this.electros[m].destruction = true;
+                this.electros[m].electro.destroy();
+            }
+        }
+
         this.obstacles = [];
         this.bees = [];
+        this.skulls = [];
+        this.electros = [];
         this.bombs = [];
     }
 
@@ -924,6 +1107,29 @@ class HortusGame extends Phaser.Scene {
         }
     }
 
+    removeElectro(index, withBolt = false)
+    {
+        if ((typeof this.electros[index] !== 'undefined') && (!this.electros[index].destruction)) {
+            let parentIdent = this.electros[index].ident;
+            this.electros[index].shoot.paused = true;
+            this.electros[index].destruction = true;
+
+            if (withBolt) {
+                for (let i = 0; i < this.bolts.length; i++) {
+                    if (!this.bolts[i].destruction) {
+                        if (this.bolts[i].parent === parentIdent) {
+                            this.removeBolt(i);
+                            continue;
+                        }
+                    }
+                }
+            }
+
+            this.electros[index].electro.destroy();
+            this.electros.slice(index, 1);
+        }
+    }
+
     removeLaser(index)
     {
         if (!this.lasers[index].destruction) {
@@ -948,6 +1154,15 @@ class HortusGame extends Phaser.Scene {
             this.phasers[index].destruction = true;
             this.phasers[index].phaser.destroy();
             this.skulls.slice(index, 1);
+        }
+    }
+
+    removeBolt(index)
+    {
+        if (!this.bolts[index].destruction) {
+            this.bolts[index].destruction = true;
+            this.bolts[index].bolt.destroy();
+            this.electros.slice(index, 1);
         }
     }
 
