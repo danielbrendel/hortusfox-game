@@ -1,3 +1,4 @@
+@if (env('APP_BACKBUTTON'))
 <div class="action-go-back">
     <div class="action-go-back-inner">
         <a href="{{ url('/') }}">
@@ -5,6 +6,7 @@
         </a>
     </div>
 </div>
+@endif
 
 <script>
     window.startGame = () => {
