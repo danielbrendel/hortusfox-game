@@ -32,12 +32,18 @@ aquashell launch.dnys
 
 Make a release build
 ```sh
-php asatru game:release
+php asatru game:release [platform]
 ```
 
 Make a debug build
 ```sh
-php asatru game:debug
+php asatru game:debug [platform]
 ```
+
+`platform` can be one of the following:
+- windows
+- linux
+- macos
+- html5 (default)
 
 The ready-packaged game builds are stored in the `/public/builds` directory
