@@ -3,6 +3,7 @@ const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
 const INVINC_MAXRAND = 15;
 const BOMB_MAXRAND = 10;
+const ROCKET_MAXRAND = 10;
 const MONSTER_PLANT_SCORE = 1;
 const MONSTER_BEE_SCORE = 3;
 const MONSTER_SKULL_SCORE = 1;
@@ -40,6 +41,7 @@ class HortusGame extends Phaser.Scene {
         this.load.spritesheet('star', 'game/assets/sprites/star.png', { frameWidth: 64, frameHeight: 60 });
         this.load.spritesheet('bluebomb', 'game/assets/sprites/bluebomb.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('detonation', 'game/assets/sprites/detonation.png', { frameWidth: 192, frameHeight: 192 });
+        this.load.spritesheet('rocket', 'game/assets/sprites/rocket.png', { frameWidth: 128, frameHeight: 128 });
 
         this.load.audio('theme', 'game/assets/sounds/theme.ogg');
         this.load.audio('invincible', 'game/assets/sounds/invincible.wav');
@@ -56,11 +58,17 @@ class HortusGame extends Phaser.Scene {
         this.load.audio('electro_spawn', 'game/assets/sounds/charge.wav');
         this.load.audio('electro_attack', 'game/assets/sounds/bolt.wav');
         this.load.audio('spike', 'game/assets/sounds/spike.wav');
+        this.load.audio('rocket', 'game/assets/sounds/rocket.wav');
+        this.load.audio('sparks', 'game/assets/sounds/sparks.wav');
 
         this.load.image('heart', 'game/assets/sprites/heart.png');
 
         for (let i = 1; i <= PLAYER_MAX_HEALTH; i++) {
             this.load.image('heart' + i, 'game/assets/sprites/heart.png');
+        }
+
+        for (let i = 1; i < 5; i++) {
+            this.load.spritesheet('spark' + i, 'game/assets/sprites/spark' + i + '.png', { frameWidth: 132, frameHeight: 231 });
         }
 
         this.trees = [];
@@ -325,6 +333,8 @@ class HortusGame extends Phaser.Scene {
         this.sndExplosion = this.sound.add('explosion');
         this.sndDetonation = this.sound.add('detonation');
         this.sndFuse = this.sound.add('fuse');
+        this.sndRocket = this.sound.add('rocket');
+        this.sndSparks = this.sound.add('sparks');
         this.sndUp = this.sound.add('up');
         this.sndMonsterSpawn = this.sound.add('monster_spawn');
         this.sndMonsterShoot = this.sound.add('monster_shoot');
@@ -1199,6 +1209,7 @@ class HortusGame extends Phaser.Scene {
         this.checkSupplySpawn(x, y);
         this.checkInvicibleSpawn(x, y);
         this.checkBombSpawn(x, y);
+        this.checkRocketSpawn(x, y);
     }
 
     checkSupplySpawn(x, y)
@@ -1407,6 +1418,102 @@ class HortusGame extends Phaser.Scene {
 
             self.sndDetonation.play();
         });
+    }
+
+    checkRocketSpawn(x, y)
+    {
+        let rndSpawnItem = Phaser.Math.Between(1, ROCKET_MAXRAND);
+        if (rndSpawnItem === ROCKET_MAXRAND) {
+            this.spawnRocketItem(x, y);
+        }
+    }
+
+    spawnRocketItem(x, y)
+    {
+        let self = this;
+
+        let item = this.physics.add.sprite(x, y, 'rocket').setScale(0.5, 0.5).refreshBody();
+
+        item.setGravityY(200);
+        item.setGravityX(Phaser.Math.Between(-100, 100));
+        item.setCollideWorldBounds(true);
+        item.setBounce(0.5, 0.5);
+
+        this.physics.add.collider(item, this.platforms);
+
+        this.physics.add.collider(item, this.player, function() {
+            item.destroy();
+
+            self.sndSparks.play();
+
+            for (let i = 0; i < 20; i++) {
+                let spark = self.physics.add.sprite(item.x, item.y, 'spark' + Phaser.Math.Between(1, 4));
+
+                spark.angle = Phaser.Math.RadToDeg(i * 0.315);
+                self.physics.velocityFromAngle(spark.angle, 500, spark.body.velocity);
+
+                self.physics.add.collider(spark, this.platforms);
+
+                for (let i = 0; i < self.obstacles.length; i++) {
+                    self.physics.add.collider(spark, self.obstacles[i].plant, function() {
+                        self.spawnExplosion(self.obstacles[i].plant.x, self.obstacles[i].plant.y);
+                        self.removeObstacle(i, true);
+                        self.playerScore += MONSTER_PLANT_SCORE;
+                        spark.destroy();
+                    });
+    
+                    self.physics.add.collider(spark, self.obstacles[i].box, function() {
+                        self.spawnExplosion(self.obstacles[i].box.x, self.obstacles[i].box.y);
+                        self.removeObstacle(i, true);
+                        spark.destroy();
+                    });
+                }
+    
+                for (let i = 0; i < self.bees.length; i++) {
+                    self.physics.add.collider(spark, self.bees[i].bee, function() {
+                        self.spawnExplosion(self.bees[i].bee.x, self.bees[i].bee.y);
+                        self.removeBee(i, true);
+                        self.playerScore += MONSTER_BEE_SCORE;
+                        spark.destroy();
+                    });
+                }
+    
+                for (let i = 0; i < self.skulls.length; i++) {
+                    self.physics.add.collider(spark, self.skulls[i].skull, function() {
+                        self.spawnExplosion(self.skulls[i].skull.x, self.skulls[i].skull.y);
+                        self.removeSkull(i, true);
+                        self.playerScore += MONSTER_SKULL_SCORE;
+                        spark.destroy();
+                    });
+                }
+    
+                for (let i = 0; i < self.electros.length; i++) {
+                    self.physics.add.collider(spark, self.electros[i].electro, function() {
+                        self.spawnExplosion(self.electros[i].electro.x, self.electros[i].electro.y);
+                        self.removeElectro(i, true);
+                        self.playerScore += MONSTER_ELECTRO_SCORE;
+                        spark.destroy();
+                    });
+                }
+    
+                if (self.spike) {
+                    self.physics.add.collider(spark, self.spike.sprite, function() {
+                        self.spawnExplosion(self.spike.sprite.x, self.spike.sprite.y);
+    
+                        self.sndSpike.stop();
+    
+                        self.spike.sprite.destroy();
+                        self.spike = null;
+    
+                        self.playerScore += MONSTER_SPIKE_SCORE;
+
+                        spark.destroy();
+                    });
+                }
+            }
+        });
+
+        this.sndRocket.play();
     }
 
     spawnPuff(x, y)
