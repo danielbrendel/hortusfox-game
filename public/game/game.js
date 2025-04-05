@@ -2,7 +2,7 @@ const PLAYER_MAX_HEALTH = 3;
 const SPEED_STEPS = 250;
 const SUPPLY_MAXRAND = 5;
 const INVINC_MAXRAND = 15;
-const BOMB_MAXRAND = 10;
+const BOMB_MAXRAND = 1;
 
 class HortusGame extends Phaser.Scene {
     preload()
@@ -709,7 +709,9 @@ class HortusGame extends Phaser.Scene {
                 delay: 1500,
                 loop: false,
                 callback: function() {
-                    self.spike.idle = false;
+                    if (self.spike) {
+                        self.spike.idle = false;
+                    }
                 },
                 callbackScope: self
             })
@@ -1108,6 +1110,8 @@ class HortusGame extends Phaser.Scene {
         item.setCollideWorldBounds(true);
         item.setBounce(0.5, 0.5);
 
+        this.physics.add.collider(item, this.platforms);
+
         this.sndFuse.play();
 
         item.anims.play('fuse', true);
@@ -1115,7 +1119,7 @@ class HortusGame extends Phaser.Scene {
             item.destroy();
 
             let detonation = self.physics.add.sprite(item.x, item.y, 'detonation');
-            detonation.setScale(4.0, 4.0);
+            detonation.setScale(5.0, 5.0);
             detonation.anims.play('detonation', true);
             detonation.on('animationcomplete', function() {
                 detonation.destroy();
