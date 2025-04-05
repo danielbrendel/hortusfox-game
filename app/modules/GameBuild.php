@@ -185,4 +185,35 @@ class GameBuild {
             throw $e;
         }
     }
+
+    /**
+     * @param $src
+     * @return void
+     * @throws \Exception
+     */
+    public static function bundleMacos($src)
+    {
+        try {
+            system('xcopy "' . $src . '" "' . public_path() . '/bundler/game/" /E /V /I /Y');
+            copy(public_path() . '/img/logo.png', public_path() . '/bundler/game/logo.png');
+
+            $build_config = [
+                'name' => env('APP_NAME'),
+                'icon' => 'game/logo.png',
+                'width' => 1024,
+                'height' => 768
+            ];
+
+            file_put_contents(public_path() . '/bundler/build.json', json_encode($build_config));
+
+            system('cd /d "' . public_path() . '/bundler" && npm run build-macos');
+
+            copy(public_path() . '/bundler/dist/HortusFox Freegame-1.0.0.app', public_path() . '/builds/game_build_' . time() . '.app');
+
+            system('rmdir /S /Q "' . public_path() . '/bundler/game"');
+            system('rmdir /S /Q "' . public_path() . '/bundler/dist"');
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
 }
