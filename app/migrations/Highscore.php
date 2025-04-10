@@ -7,7 +7,7 @@
 /**
  * This class specifies a migration
  */
-class Example_Migration {
+class Highscore_Migration {
     private $database = null;
     private $connection = null;
 
@@ -29,10 +29,11 @@ class Example_Migration {
      */
     public function up()
     {
-        $this->database = new Asatru\Database\Migration('Example', $this->connection);
+        $this->database = new Asatru\Database\Migration('highscore', $this->connection);
         $this->database->drop();
         $this->database->add('id INT NOT NULL AUTO_INCREMENT PRIMARY KEY');
-        $this->database->add('content TEXT NOT NULL');
+        $this->database->add('playername VARCHAR(512) NOT NULL');
+        $this->database->add('score INT NOT NULL');
         $this->database->add('updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
         $this->database->add('created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
         $this->database->create();

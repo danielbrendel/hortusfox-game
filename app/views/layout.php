@@ -38,6 +38,16 @@
                         });
                 }
             };
+
+            document.addEventListener('DOMContentLoaded', function() {
+                localStorage.setItem('service_url', '{{ env('APP_SERVICEURL') }}');
+
+                let playername = localStorage.getItem('playername');
+                if ((!playername) || (playername.length == 0)) {
+                    playername = prompt('Please enter your name', 'Unnamed player');
+                    localStorage.setItem('playername', playername);
+                }
+            });
         </script>
     </body>
 </html>

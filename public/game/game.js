@@ -61,6 +61,7 @@ class HortusGame extends Phaser.Scene {
         this.load.audio('spike', 'game/assets/sounds/spike.wav');
         this.load.audio('rocket', 'game/assets/sounds/rocket.wav');
         this.load.audio('sparks', 'game/assets/sounds/sparks.wav');
+        this.load.audio('published', 'game/assets/sounds/published.wav');
 
         this.load.image('heart', 'game/assets/sprites/heart.png');
 
@@ -313,6 +314,21 @@ class HortusGame extends Phaser.Scene {
 
         }).setVisible(false);
 
+        this.btnRecord = this.add.text(gameconfig.scale.width / 2 - 45, gameconfig.scale.height / 2 + 145, 'Publish record', {
+            color: 'rgb(90, 235, 100)',
+            fontSize: '20px'
+        }).setInteractive().on('pointerdown', function() {
+            window.addHighscore(localStorage.getItem('playername'), localStorage.getItem('player_record'));
+            self.btnRecord.setVisible(false);
+            self.sndPublished.play();
+        }).on('pointerover', function() {
+            self.btnRecord.setStyle({ color: 'rgb(124, 241, 132)', fontSize: '20px' });
+            document.body.style.cursor = 'pointer';
+        }).on('pointerout', function() {
+            self.btnRecord.setStyle({ color: 'rgb(90, 235, 100)', fontSize: '20px' });
+            document.body.style.cursor = '';
+        }).setVisible(false);
+
         this.rectRestart = this.add.image(gameconfig.scale.width / 2 + 37, gameconfig.scale.height / 2 + 90, 'button').setVisible(false);
         this.btnRestart = this.add.text(gameconfig.scale.width / 2 - 5, gameconfig.scale.height / 2 + 81, 'Restart', {
             color: 'rgb(0, 100, 150)',
@@ -345,6 +361,7 @@ class HortusGame extends Phaser.Scene {
         this.sndElectroSpawn = this.sound.add('electro_spawn');
         this.sndElectroAttack = this.sound.add('electro_attack');
         this.sndSpike = this.sound.add('spike');
+        this.sndPublished = this.sound.add('published');
 
         this.children.bringToTop(this.txtScore);
 
@@ -1016,6 +1033,11 @@ class HortusGame extends Phaser.Scene {
         if ((playerRecord === null) || (this.playerScore > playerRecord)) {
             localStorage.setItem('player_record', this.playerScore);
             playerRecord = this.playerScore;
+
+            if (!this.btnRecord.visible) {
+                this.btnRecord.setVisible(true);
+                this.children.bringToTop(this.btnRecord);
+            }
         }
 
         this.player.setVelocity(0, 0);

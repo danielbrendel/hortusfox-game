@@ -36,6 +36,7 @@ class GameBuild {
 
         $view = view('layout', ['content', 'index'], [])->out(true);
         $view = str_replace('/play', '/play.html', $view);
+        $view = str_replace('/highscore', '/highscore.html', $view);
         $view = str_replace('http://' . $_SERVER['SERVER_NAME'] . '/', '', $view);
         file_put_contents(public_path() . '/build/index.html', $view);
 
@@ -43,6 +44,11 @@ class GameBuild {
         $view = str_replace('http://' . $_SERVER['SERVER_NAME'] . '/', '', $view);
         $view = str_replace('href=""', 'href="index.html"', $view);
         file_put_contents(public_path() . '/build/play.html', $view);
+
+        $view = view('layout', ['content', 'highscore'], [])->out(true);
+        $view = str_replace('http://' . $_SERVER['SERVER_NAME'] . '/', '', $view);
+        $view = str_replace('href=""', 'href="index.html"', $view);
+        file_put_contents(public_path() . '/build/highscore.html', $view);
 
         echo "Copying assets...\n";
 

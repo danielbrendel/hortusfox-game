@@ -43,4 +43,15 @@ class IndexController extends BaseController {
 	{
 		return parent::view(['content', 'game']);
 	}
+
+	/**
+	 * Handles URL: /highscore
+	 * 
+	 * @param Asatru\Controller\ControllerArg $request
+	 * @return Asatru\View\ViewHandler
+	 */
+	public function highscore($request)
+	{
+		return parent::view(['content', 'highscore']);
+	}
 }
