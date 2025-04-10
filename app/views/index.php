@@ -48,3 +48,11 @@
         </div>
     </div>
 </div>
+
+<script>
+    if ((screen.orientation) && (screen.orientation.lock)) {
+        screen.orientation.lock('portrait').catch((err) => {
+            console.error('Failed to lock orientation to portrait: ', err);
+        });
+    }
+</script>
