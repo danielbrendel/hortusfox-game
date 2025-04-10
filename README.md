@@ -1,8 +1,8 @@
-# HortusFox Freegame
+# Bouncy Garden Fox
 
 ## Description
 
-HortusFox freegame is a mini-game under the HortusFox umbrella. It is made to draw attention to the HortusFox webapp.
+Bouncy Garden Fox is a mini-game under the HortusFox umbrella. It is made to draw attention to the HortusFox webapp.
 The game is a jump & run action game where you play a little fox that has to survive as long as possible. Defeat all approaching
 enemies and collect points. Various special items can spawn during a gameplay session in order to boost your run. There is no
 real goal in the game, just endure as much as possible during a match to climb at the top of the highscore.

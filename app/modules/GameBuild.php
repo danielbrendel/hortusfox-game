@@ -154,7 +154,7 @@ class GameBuild {
 
             system('cd /d "' . public_path() . '/bundler" && npm run build-windows');
 
-            copy(public_path() . '/bundler/dist/HortusFox Freegame 1.0.0.exe', public_path() . '/builds/game_build_' . time() . '.exe');
+            copy(public_path() . '/bundler/dist/Bouncy Garden Fox 1.0.0.exe', public_path() . '/builds/game_build_' . time() . '.exe');
 
             system('rmdir /S /Q "' . public_path() . '/bundler/game"');
             system('rmdir /S /Q "' . public_path() . '/bundler/dist"');
@@ -185,7 +185,7 @@ class GameBuild {
 
             system('cd /d "' . public_path() . '/bundler" && npm run build-linux');
 
-            copy(public_path() . '/bundler/dist/HortusFox Freegame-1.0.0-arm64.AppImage', public_path() . '/builds/game_build_' . time() . '.AppImage');
+            copy(public_path() . '/bundler/dist/Bouncy Garden Fox-1.0.0-arm64.AppImage', public_path() . '/builds/game_build_' . time() . '.AppImage');
 
             system('rmdir /S /Q "' . public_path() . '/bundler/game"');
             system('rmdir /S /Q "' . public_path() . '/bundler/dist"');
@@ -216,7 +216,7 @@ class GameBuild {
 
             system('cd /d "' . public_path() . '/bundler" && npm run build-macos');
 
-            copy(public_path() . '/bundler/dist/HortusFox Freegame-1.0.0.app', public_path() . '/builds/game_build_' . time() . '.app');
+            copy(public_path() . '/bundler/dist/Bouncy Garden Fox-1.0.0.app', public_path() . '/builds/game_build_' . time() . '.app');
 
             system('rmdir /S /Q "' . public_path() . '/bundler/game"');
             system('rmdir /S /Q "' . public_path() . '/bundler/dist"');

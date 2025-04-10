@@ -2,7 +2,7 @@
     <div class="startmenu-overlay">
         <div class="startmenu-inner">
             <div class="startmenu-title">
-                <h1>The Hortus Game</h1>
+                <h1>Bouncy Garden Fox</h1>
 
                 <h2>A small jump & run game for free!</h2>
             </div>

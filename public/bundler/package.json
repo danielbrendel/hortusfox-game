@@ -1,12 +1,12 @@
 {
-    "name": "hortusfox-game-bundler",
+    "name": "bouncy-garden-fox-bundler",
     "version": "1.0.0",
     "description": "A free mini-game under the HortusFox umbrella",
     "author": "Daniel Brendel",
     "main": "src/main.js",
     "build": {
-        "appId": "com.hortusfox.freegame",
-        "productName": "HortusFox Freegame",
+        "appId": "com.hortusfox.bouncygardenfox",
+        "productName": "Bouncy Garden Fox",
         "icon": "game/logo"
     },
     "scripts": {
