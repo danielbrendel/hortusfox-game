@@ -134,10 +134,10 @@ class HortusGame extends Phaser.Scene {
         this.addTree(200, gameconfig.scale.height - 80);
         this.addTree(gameconfig.scale.width - 190, gameconfig.scale.height - 80);
 
-        this.add.image(455, gameconfig.scale.height - 105, 'flower').setScale(0.5, 0.5);
-        this.add.image(635, gameconfig.scale.height - 105, 'flower').setScale(0.5, 0.5);
-        this.add.image(375, gameconfig.scale.height - 86, 'shrooms').setScale(0.75, 0.75);
-        this.add.image(535, gameconfig.scale.height - 86, 'shrooms').setScale(0.75, 0.75);
+        this.add.image(gameconfig.scale.width / 2 - 100, gameconfig.scale.height - 105, 'flower').setScale(0.5, 0.5);
+        this.add.image(gameconfig.scale.width / 2 + 100, gameconfig.scale.height - 105, 'flower').setScale(0.5, 0.5);
+        this.add.image(gameconfig.scale.width / 2 - 250, gameconfig.scale.height - 86, 'shrooms').setScale(0.75, 0.75);
+        this.add.image(gameconfig.scale.width / 2 + 250, gameconfig.scale.height - 86, 'shrooms').setScale(0.75, 0.75);
         this.add.image(50, gameconfig.scale.height - 79, 'bush').setScale(0.75, 0.75);
         this.add.image(gameconfig.scale.width - 40, gameconfig.scale.height - 79, 'bush').setScale(0.75, 0.75);
 
