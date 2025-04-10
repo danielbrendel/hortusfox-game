@@ -17,6 +17,8 @@
 
     window.startGame = () => {
         gameconfig.physics.arcade.debug = {{ env('APP_DEBUG') ? 'true' : 'false' }};
+        gameconfig.scale.width = {{ env('APP_GAMERESX', 1024) }};
+        gameconfig.scale.height = {{ env('APP_GAMERESY', 768) }};
         const game = new Phaser.Game(gameconfig);
     };
 
