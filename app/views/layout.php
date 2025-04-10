@@ -15,7 +15,7 @@
         <title>{{ env('APP_NAME') }}</title>
 
         <link rel="manifest" href="{{ asset('manifest.json') }}"/>
-
+        
         <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}"/>
 
         <script src="{{ asset('js/fontawesome.js') }}"></script>
@@ -25,6 +25,20 @@
 
     <body>
         {%content%}
+
+        <div class="prompt-overlay is-hidden">
+            <div id="prompt-content" class="prompt-content">
+                <div class="prompt-title">Please enter your name</div>
+
+                <div class="prompt-input">
+                    <input type="text" id="txtInputValue" value=""/>
+                </div>
+
+                <div class="prompt-action">
+                    <a class="button button-save" href="javascript:void(0);" onclick="window.promptAction();">Save</a>
+                </div>
+            </div>
+        </div>
 
         <script>
             window.onload = function() {
@@ -44,8 +58,9 @@
 
                 let playername = localStorage.getItem('playername');
                 if ((!playername) || (playername.length == 0)) {
-                    playername = prompt('Please enter your name', 'Unnamed player');
-                    localStorage.setItem('playername', playername);
+                    window.showPrompt('Please enter your name', function(text) {
+                        localStorage.setItem('playername', text);
+                    }, 'Unnamed player');
                 }
             });
         </script>
