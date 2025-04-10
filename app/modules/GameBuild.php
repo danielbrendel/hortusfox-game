@@ -57,6 +57,7 @@ class GameBuild {
         copy(public_path() . '/game/game.js', public_path() . '/build/game/game.js');
         copy(public_path() . '/manifest.json', public_path() . '/build/manifest.json');
         copy(public_path() . '/serviceworker.js', public_path() . '/build/serviceworker.js');
+        copy(public_path() . '/img/logo.png', public_path() . '/build/game/logo.png');
 
         system('xcopy "' . public_path() . '/game/assets" "' . public_path() . '/build/game/assets/" /E /V /I /Y');
 
@@ -146,8 +147,8 @@ class GameBuild {
             $build_config = [
                 'name' => env('APP_NAME'),
                 'icon' => 'game/logo.png',
-                'width' => 1024,
-                'height' => 768
+                'width' => env('APP_GAMERESX'),
+                'height' => env('APP_GAMERESY')
             ];
 
             file_put_contents(public_path() . '/bundler/build.json', json_encode($build_config));
@@ -177,8 +178,8 @@ class GameBuild {
             $build_config = [
                 'name' => env('APP_NAME'),
                 'icon' => 'game/logo.png',
-                'width' => 1024,
-                'height' => 768
+                'width' => env('APP_GAMERESX'),
+                'height' => env('APP_GAMERESY')
             ];
 
             file_put_contents(public_path() . '/bundler/build.json', json_encode($build_config));
@@ -208,8 +209,8 @@ class GameBuild {
             $build_config = [
                 'name' => env('APP_NAME'),
                 'icon' => 'game/logo.png',
-                'width' => 1024,
-                'height' => 768
+                'width' => env('APP_GAMERESX'),
+                'height' => env('APP_GAMERESY')
             ];
 
             file_put_contents(public_path() . '/bundler/build.json', json_encode($build_config));

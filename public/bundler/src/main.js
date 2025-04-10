@@ -7,7 +7,8 @@ let cfgBuild;
 
 function config(item)
 {
-    const data = fs.readFileSync(item + '.json', 'utf8');
+    const filepath = path.resolve(__dirname, '..', item + '.json');
+    const data = fs.readFileSync(filepath, 'utf8');
     return JSON.parse(data);
 }
 
@@ -26,7 +27,7 @@ app.whenReady().then(() => {
     });
     
     Menu.setApplicationMenu(null);
-    mainWindow.loadFile('game/index.html');
+    mainWindow.loadFile(path.resolve(__dirname, '..', 'game', 'index.html'));
     
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
