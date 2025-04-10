@@ -190,6 +190,8 @@ html, body {
     position: relative;
     margin-top: 20px;
     margin-bottom: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 .highscore-item:hover {
@@ -212,6 +214,7 @@ html, body {
 .highscore-item-score {
     position: relative;
     display: inline-block;
+    width: 10%;
     text-align: right;
     color: rgb(253, 232, 111);
 }
@@ -252,7 +255,7 @@ a.button:hover {
 }
 
 .button-back:hover {
-    background-color: rgb(234, 235, 69);
+    background-color: rgb(242, 245, 81);
     color: rgb(50, 50, 50);
 }
 

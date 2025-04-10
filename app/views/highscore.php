@@ -3,7 +3,9 @@
         <div class="highscore-inner">
             <h1>Highscore</h1>
 
-            <div class="highscore-list"></div>
+            <div class="highscore-list">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
 
             <div class="">
                 <a class="button button-back" href="{{ url('/') }}">Main menu</a>

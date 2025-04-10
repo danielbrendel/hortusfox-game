@@ -55,7 +55,7 @@ class HighscoreController extends BaseController {
             $playername = $request->params()->query('playername', 'Unnamed player');
             $score = $request->params()->query('score', 0);
 
-            Highscore::addScore($playername, $score);
+            Highscore::addScore(trim($playername), $score);
 
             return json([
                 'code' => 200

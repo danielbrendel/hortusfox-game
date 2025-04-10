@@ -25,12 +25,13 @@ class HortusGame extends Phaser.Scene {
         this.load.image('shrooms', 'game/assets/sprites/shrooms.png');
         this.load.image('bush', 'game/assets/sprites/bush.png');
         this.load.image('box', 'game/assets/sprites/box.png');
-        this.load.image('button', 'game/assets/sprites/button.png');
+        this.load.image('button_blue', 'game/assets/sprites/button_blue.png');
+        this.load.image('button_yellow', 'game/assets/sprites/button_yellow.png');
         this.load.spritesheet('fox', 'game/assets/sprites/fox.png', { frameWidth: 48, frameHeight: 26 });
         this.load.spritesheet('plant', 'game/assets/sprites/plant.png', { frameWidth: 376, frameHeight: 500 });
         this.load.spritesheet('bomb', 'game/assets/sprites/bomb.png', { frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('laser', 'game/assets/sprites/laser.png', { frameWidth: 123, frameHeight: 119 });
-        this.load.spritesheet('phaser', 'game/assets/sprites/phaser.png', { frameWidth: 99, frameHeight: 60 });
+        this.load.spritesheet('phaser', 'game/assets/sprites/phaser.png', { frameWidth: 120, frameHeight: 71 });
         this.load.spritesheet('bolt', 'game/assets/sprites/bolt.png', { frameWidth: 32, frameHeight: 256 });
         this.load.spritesheet('bee', 'game/assets/sprites/bee.png', { frameWidth: 712, frameHeight: 520});
         this.load.spritesheet('skull', 'game/assets/sprites/skull.png', { frameWidth: 512, frameHeight: 554 });
@@ -329,8 +330,8 @@ class HortusGame extends Phaser.Scene {
             document.body.style.cursor = '';
         }).setVisible(false);
 
-        this.rectRestart = this.add.image(gameconfig.scale.width / 2 + 37, gameconfig.scale.height / 2 + 90, 'button').setVisible(false);
-        this.btnRestart = this.add.text(gameconfig.scale.width / 2 - 5, gameconfig.scale.height / 2 + 81, 'Restart', {
+        this.rectRestart = this.add.image(gameconfig.scale.width / 2 - 70, gameconfig.scale.height / 2 + 90, 'button_blue').setVisible(false);
+        this.btnRestart = this.add.text(gameconfig.scale.width / 2 - 111, gameconfig.scale.height / 2 + 81, 'Restart', {
             color: 'rgb(0, 100, 150)',
             fontSize: '20px'
         }).setInteractive().on('pointerdown', function() {
@@ -340,6 +341,20 @@ class HortusGame extends Phaser.Scene {
             document.body.style.cursor = 'pointer';
         }).on('pointerout', function() {
             self.btnRestart.setStyle({ color: 'rgb(0, 100, 150)', fontSize: '20px' });
+            document.body.style.cursor = '';
+        }).setVisible(false);
+
+        this.rectMainMenu = this.add.image(gameconfig.scale.width / 2 + 135, gameconfig.scale.height / 2 + 90, 'button_yellow').setVisible(false);
+        this.btnMainMenu = this.add.text(gameconfig.scale.width / 2 + 85, gameconfig.scale.height / 2 + 81, 'Main menu', {
+            color: 'rgb(123, 115, 5)',
+            fontSize: '20px'
+        }).setInteractive().on('pointerdown', function() {
+            location.href = '/';
+        }).on('pointerover', function() {
+            self.btnMainMenu.setStyle({ color: 'rgb(20, 20, 20)', fontSize: '20px' });
+            document.body.style.cursor = 'pointer';
+        }).on('pointerout', function() {
+            self.btnMainMenu.setStyle({ color: 'rgb(123, 115, 5)', fontSize: '20px' });
             document.body.style.cursor = '';
         }).setVisible(false);
 
@@ -464,7 +479,8 @@ class HortusGame extends Phaser.Scene {
                         return;
                     }
 
-                    let laser = self.physics.add.sprite(plant.x - 20, plant.y, 'laser');  
+                    let laser = self.physics.add.sprite(plant.x - 20, plant.y, 'laser');
+                    laser.body.setSize(37, 19).setOffset(45, 50)
                     laser.setVelocity(Phaser.Math.Between(200, 350) * -1, 0);
                     
                     self.lasers.push({
@@ -687,7 +703,8 @@ class HortusGame extends Phaser.Scene {
                         return;
                     }
 
-                    let phaser = self.physics.add.sprite(skull.x - 20, skull.y, 'phaser');  
+                    let phaser = self.physics.add.sprite(skull.x - 20, skull.y, 'phaser');
+                    phaser.body.setSize(83, 25).setOffset(18, 22);
                     phaser.setVelocity(Phaser.Math.Between(300, 550) * -1, 0);
                     
                     self.phasers.push({
@@ -939,10 +956,7 @@ class HortusGame extends Phaser.Scene {
             this.spike.sprite.x -= 10;
 
             if (this.spike.sprite.x <= -50) {
-                this.sndSpike.stop();
-
-                this.spike.sprite.destroy();
-                this.spike = null;
+                this.removeSpike();
             }
         }
     }
@@ -1002,11 +1016,34 @@ class HortusGame extends Phaser.Scene {
             }
         }
 
+        for (let n = 0; n < this.bolts.length; n++) {
+            if (!this.bolts[n].destruction) {
+                this.bolts[n].destruction = true;
+                this.bolts[n].bolt.destroy();
+            }
+        }
+
+        for (let v = 0; v < this.phasers.length; v++) {
+            if (!this.phasers[v].destruction) {
+                this.phasers[v].destruction = true;
+                this.phasers[v].phaser.destroy();
+            }
+        }
+
+        if (this.spike) {
+            this.sndSpike.stop();
+            this.spike.sprite.destroy();
+            this.spike = null;
+        }
+
         this.obstacles = [];
         this.bees = [];
         this.skulls = [];
         this.electros = [];
         this.bombs = [];
+        this.bolts = [];
+        this.lasers = [];
+        this.phasers = [];
     }
 
     inflictPlayer()
@@ -1069,6 +1106,16 @@ class HortusGame extends Phaser.Scene {
             this.children.bringToTop(this.btnRestart);
 
             this.clearGameObjects();
+        }
+
+        if (!this.rectMainMenu.visible) {
+            this.rectMainMenu.setVisible(true);
+            this.children.bringToTop(this.rectMainMenu);
+        }
+
+        if (!this.btnMainMenu.visible) {
+            this.btnMainMenu.setVisible(true);
+            this.children.bringToTop(this.btnMainMenu);
         }
     }
 
@@ -1167,6 +1214,15 @@ class HortusGame extends Phaser.Scene {
 
             this.electros[index].electro.destroy();
             this.electros.slice(index, 1);
+        }
+    }
+
+    removeSpike()
+    {
+        if (this.spike) {
+            this.sndSpike.stop();
+            this.spike.sprite.destroy();
+            this.spike = null;
         }
     }
 
@@ -1452,10 +1508,7 @@ class HortusGame extends Phaser.Scene {
                 self.physics.add.collider(detonation, self.spike.sprite, function() {
                     self.spawnExplosion(self.spike.sprite.x, self.spike.sprite.y);
 
-                    self.sndSpike.stop();
-
-                    self.spike.sprite.destroy();
-                    self.spike = null;
+                    self.removeSpike();
 
                     self.playerScore += MONSTER_SPIKE_SCORE;
                 });
@@ -1545,10 +1598,7 @@ class HortusGame extends Phaser.Scene {
                     self.physics.add.collider(spark, self.spike.sprite, function() {
                         self.spawnExplosion(self.spike.sprite.x, self.spike.sprite.y);
     
-                        self.sndSpike.stop();
-    
-                        self.spike.sprite.destroy();
-                        self.spike = null;
+                        self.removeSpike();
     
                         self.playerScore += MONSTER_SPIKE_SCORE;
 

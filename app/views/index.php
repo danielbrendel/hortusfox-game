@@ -9,7 +9,7 @@
 
             <div class="startmenu-actions">
                 <a class="button button-start" href="{{ url('/play') }}">Start game</a>
-                <a class="button button-scores" href="{{ url('/highscore') }}">Highscores</a>
+                <a class="button button-scores" href="{{ url('/highscore') }}">Highscore</a>
             </div>
 
             <div class="startmenu-info">
