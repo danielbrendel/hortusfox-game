@@ -1,8 +1,15 @@
 # Bouncy Garden Fox launcher
 
+require "array";
 require "auto";
+require "fileio";
+require "input";
 
 const SERVER_PORT int <= 8000;
+
+array arrExecutables string 3 (
+	"php.exe", "mysqld.exe", "httpd.exe"
+);
 
 global project_path string;
 getscriptpath project_path;
@@ -14,7 +21,49 @@ if (%SERVER_PORT, -nt, 80) {
 	set server_url <= "%server_url:%SERVER_PORT";
 };
 
-print "Launching Bouncy Garden Fox on %server_url";
+global flag bool;
+
+function create_path_file void()
+{
+	local apache_path string;
+	local mysql_path string;
+	local tmstamp string;
+	local hfile int;
+	
+	input apache_path "Please enter path to your httpd.exe: ";
+	input mysql_path "Please enter path to your mysqld.exe: ";
+	
+	fmtdatetime "%F %T" tmstamp;
+	
+	fopen "%project_path/paths.dnys" false hfile;
+	if (%hfile, -nt, %FIO_INVALID_HANDLE) {
+		fwriteline %hfile "# Auto-generated at %tmstamp";
+		fwriteline %hfile "";
+		fwriteline %hfile { const APACHE_PATH string <= "%apache_path"; };
+		fwriteline %hfile { const MYSQL_PATH string <= "%mysql_path"; };
+		
+		fclose %hfile;
+	};
+};
+
+fexists "%project_path/paths.dnys" flag;
+if (%flag, -eq, false) {
+	call create_path_file() => void;
+};
+
+exec "%project_path/paths.dnys";
+
+aut_run "%APACHE_PATH/httpd.exe" "" "%APACHE_PATH" void;
+aut_run "%MYSQL_PATH/mysqld" "--defaults-file=%MYSQL_PATH/my.ini --standalone" "%MYSQL_PATH" void;
 
 aut_run "php" "asatru serve %SERVER_PORT" "%project_path" void;
 aut_run "%server_url" "" "" void;
+
+print "Bouncy Garden Fox is now running...";
+print "Press any key to shutdown this service";
+
+pause;
+
+for (i, 0, %arrExecutables.length, -inc) {
+	sys { taskkill /F /IM %arrExecutables[%i] };
+};

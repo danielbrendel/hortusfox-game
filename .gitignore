@@ -6,3 +6,4 @@
 /public/builds
 .env
 .phpunit.result.cache
+paths.dnys
