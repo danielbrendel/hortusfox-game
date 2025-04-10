@@ -19,8 +19,8 @@
         <link rel="icon" type="image/png" href="{{ asset('img/logo.png') }}"/>
 
         <script src="{{ asset('js/fontawesome.js') }}"></script>
-        <script src="{{ asset('js/app.js') }}"></script>
-        <script src="{{ asset('game/game.js') }}"></script>
+        <script src="{{ asset('js/app.js', true) }}"></script>
+        <script src="{{ asset('game/game.js', true) }}"></script>
     </head>
 
     <body>
