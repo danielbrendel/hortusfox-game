@@ -11,6 +11,7 @@ real goal in the game, just endure as much as possible during a match to climb a
 - Multiple enemies
 - Various items
 - Cute nature theme
+- Highscores
 - Platform independent
 - Build & package command
 
