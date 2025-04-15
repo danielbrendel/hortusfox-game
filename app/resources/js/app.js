@@ -40,8 +40,8 @@ window.addHighscore = function(playername, score) {
     });
 };
 
-window.fetchHighscore = function(target) {
-    window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/list', {}, function(response) {
+window.fetchHighscore = function(target, what) {
+    window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/list', { what: what }, function(response) {
         if (response.code == 200) {
             let elTarget = document.querySelector(target);
 

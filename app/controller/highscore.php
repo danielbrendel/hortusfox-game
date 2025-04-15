@@ -21,6 +21,24 @@ class HighscoreController extends BaseController {
     }
 
     /**
+	 * Handles URL: /highscore
+	 * 
+	 * @param Asatru\Controller\ControllerArg $request
+	 * @return Asatru\View\ViewHandler
+	 */
+	public function highscore($request)
+	{
+		$now = Carbon::now();
+		$nextMonday = Carbon::now()->next(Carbon::MONDAY)->startOfDay();
+		$diff = $now->diff($nextMonday);
+		$remaining = $diff->format('%a days');
+
+		return parent::view(['content', 'highscore'], [
+			'remaining' => $remaining
+		]);
+	}
+
+    /**
 	 * Handles URL: /scores/list
 	 * 
 	 * @param Asatru\Controller\ControllerArg $request
@@ -29,7 +47,13 @@ class HighscoreController extends BaseController {
     public function list($request)
     {
         try {
-            $scores = Highscore::getList();
+            $what = $request->params()->query('what', Highscore::HIGHSCORE_SELECTION_WEEKLY);
+
+            if ($what === Highscore::HIGHSCORE_SELECTION_WEEKLY) {
+                $scores = Highscore::getWeekly();
+            } else if ($what === Highscore::HIGHSCORE_SELECTION_ALLTIME) {
+                $scores = Highscore::getAllTime();
+            }
 
             return json([
                 'code' => 200,

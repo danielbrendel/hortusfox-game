@@ -18,7 +18,7 @@
 return [
     array('/', 'GET', 'index@index'),
     array('/play', 'GET', 'index@play'),
-    array('/highscore', 'GET', 'index@highscore'),
+    array('/highscore', 'GET', 'highscore@highscore'),
     array('/scores/list', 'ANY', 'highscore@list'),
     array('/scores/add', 'POST', 'highscore@add'),
     array('$404', 'ANY', 'error404@index')

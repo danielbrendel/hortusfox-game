@@ -175,7 +175,7 @@ html, body {
     left: 50%;
     transform: translate(-50%, -55%);
     font-family: "Jersey 10", sans-serif;
-    font-size: 2.0em;
+    font-size: 1.76em;
     text-align: center;
     color: rgb(200, 200, 200);
 }
@@ -184,6 +184,27 @@ html, body {
     position: relative;
     margin-top: 20px;
     margin-bottom: 69px;
+}
+
+.highscore-selection {
+    margin-bottom: 35px;
+}
+
+.highscore-selection, .highscore-selection a {
+    color: rgb(255, 205, 69)
+}
+
+.highscore-selection a {
+    text-decoration: none;
+}
+
+.highscore-selection a:hover {
+    text-decoration: underline;
+}
+
+.highscore-delimiter {
+    margin-left: 20px;
+    margin-right: 20px;
 }
 
 .highscore-item {
