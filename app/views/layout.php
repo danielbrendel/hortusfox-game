@@ -60,6 +60,7 @@
                 if ((!playername) || (playername.length == 0)) {
                     window.showPrompt('Please enter your name', function(text) {
                         localStorage.setItem('playername', text);
+                        window.playSound('{{ asset('game/assets/sounds/nameselect.wav') }}');
                     }, 'Unnamed player');
                 }
             });

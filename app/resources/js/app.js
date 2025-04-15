@@ -96,3 +96,8 @@ window.promptAction = function() {
         window.currentPromptCallback(eltext.value);
     }
 };
+
+window.playSound = function(url) {
+    const audio = new Audio(url);
+    audio.play();
+};
