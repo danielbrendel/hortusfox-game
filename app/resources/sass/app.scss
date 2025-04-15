@@ -44,22 +44,48 @@ html, body {
 
 .startmenu-title {
     position: relative;
-    margin-bottom: 81px;
+    margin-bottom: 50px;
+    @media screen and (min-width: 1254px) {
+        margin-bottom: 81px;
+    }
 }
 
 .startmenu-title h1 {
     font-size: 2.5em;
     margin-bottom: -30px;
+    @media screen and (max-width: 1253px) {
+        font-size: 1.8em;
+        margin-bottom: -15px;
+    }
     color: rgb(50, 195, 125);
 }
 
 .startmenu-title h2 {
     font-size: 1.5em;
+    @media screen and (max-width: 1253px) {
+        font-size: 1.2em;
+    }
     color: rgb(240, 240, 240);
 }
 
+.startmenu-screenshot {
+    position: relative;
+    width: 100%;
+    margin-bottom: 40px;
+    @media screen and (min-width: 1254px) {
+        display: none;
+    }
+}
+
+.startmenu-screenshot img {
+    width: 100%;
+}
+
 .startmenu-actions {
-    margin-bottom: 79px;
+    margin-bottom: 45px;
+    @media screen and (min-width: 1254px) {
+        margin-bottom: 79px;
+    }
 }
 
 .startmenu-info {
@@ -78,7 +104,10 @@ html, body {
 
 .startmenu-links {
     position: relative;
-    margin-top: 63px;
+    margin-top: 40px;
+    @media screen and (min-width: 1254px) {
+        margin-top: 63px;
+    }
 }
 
 .startmenu-links-item {
@@ -118,7 +147,10 @@ html, body {
 
 .startmenu-build-type {
     position: relative;
-    margin-top: 50px;
+    margin-top: 30px;
+    @media screen and (min-width: 1254px) {
+        margin-top: 50px;
+    }
     color: rgb(255, 132, 132);
 }
 

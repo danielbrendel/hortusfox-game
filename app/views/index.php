@@ -4,7 +4,11 @@
             <div class="startmenu-title">
                 <h1>Bouncy Garden Fox</h1>
 
-                <h2>A small jump & run game for free!</h2>
+                <h2>A free jump & run game</h2>
+            </div>
+
+            <div class="startmenu-screenshot">
+                <img src="{{ asset('img/screenshot-game.png') }}" alt="screenshot"/>
             </div>
 
             <div class="startmenu-actions">
