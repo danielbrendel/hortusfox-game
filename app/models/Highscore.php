@@ -1,11 +1,7 @@
 <?php
 
-/*
-    Asatru PHP - Model
-*/
-
 /**
- * This class extends the base model class and represents your associated table
+ * Class Highscore
  */ 
 class Highscore extends \Asatru\Database\Model {
     const HIGHSCORE_SELECTION_WEEKLY = 'weekly';

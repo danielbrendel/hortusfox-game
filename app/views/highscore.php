@@ -32,7 +32,7 @@
             document.querySelector('#highscore-selection-alltime').style.textDecoration = 'underline';
         }
 
-        window.fetchHighscore('.highscore-list', window.highscoreSelection);
+        window.fetchHighscore('.highscore-list', window.highscoreSelection, '#highscore-selection-weekly');
     };
 
     document.addEventListener('DOMContentLoaded', function() {

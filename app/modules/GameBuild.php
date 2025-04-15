@@ -45,7 +45,7 @@ class GameBuild {
         $view = str_replace('href=""', 'href="index.html"', $view);
         file_put_contents(public_path() . '/build/play.html', $view);
 
-        $view = view('layout', ['content', 'highscore'], [])->out(true);
+        $view = view('layout', ['content', 'highscore'], ['remaining' => Utils::weeklyRemaining()])->out(true);
         $view = str_replace('http://' . $_SERVER['SERVER_NAME'] . '/', '', $view);
         $view = str_replace('href=""', 'href="index.html"', $view);
         file_put_contents(public_path() . '/build/highscore.html', $view);

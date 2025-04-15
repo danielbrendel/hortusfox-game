@@ -40,7 +40,7 @@ window.addHighscore = function(playername, score) {
     });
 };
 
-window.fetchHighscore = function(target, what) {
+window.fetchHighscore = function(target, what, weekly) {
     window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/list', { what: what }, function(response) {
         if (response.code == 200) {
             let elTarget = document.querySelector(target);
@@ -60,6 +60,11 @@ window.fetchHighscore = function(target, what) {
                     </div>
                 `;
             });
+
+            let elWeekly = document.querySelector(weekly);
+            if (elWeekly) {
+                elWeekly.innerHTML = 'Weekly (' + response.remaining + ')';
+            }
         } else {
             console.error(response.msg);
         }

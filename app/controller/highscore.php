@@ -32,13 +32,8 @@ class HighscoreController extends BaseController {
 	 */
 	public function highscore($request)
 	{
-		$now = Carbon::now();
-		$nextMonday = Carbon::now()->next(Carbon::MONDAY)->startOfDay();
-		$diff = $now->diff($nextMonday);
-		$remaining = $diff->format('%a days');
-
 		return parent::view(['content', 'highscore'], [
-			'remaining' => $remaining
+			'remaining' => Utils::weeklyRemaining()
 		]);
 	}
 
@@ -61,7 +56,8 @@ class HighscoreController extends BaseController {
 
             return json([
                 'code' => 200,
-                'data' => $scores->asArray()
+                'data' => $scores->asArray(),
+                'remaining' => Utils::weeklyRemaining()
             ]);
         } catch (\Exception $e) {
             return json([
