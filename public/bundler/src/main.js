@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu } = require('electron');
+const { app, BrowserWindow, Menu, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 
@@ -24,6 +24,19 @@ app.whenReady().then(() => {
             contextIsolation: true
         },
         icon: cfgBuild.icon
+    });
+
+    mainWindow.webContents.setWindowOpenHandler(({ url }) => {
+        shell.openExternal(url);
+        return { action: 'deny' };
+    });
+
+    mainWindow.webContents.on('will-navigate', (event, url) => {
+        const isExternal = !url.startsWith('file://');
+        if (isExternal) {
+            event.preventDefault();
+            shell.openExternal(url);
+        }
     });
     
     Menu.setApplicationMenu(null);

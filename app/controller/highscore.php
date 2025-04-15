@@ -8,6 +8,8 @@
  * This class represents your controller
  */
 class HighscoreController extends BaseController {
+    const HIGHSCORE_LAYOUT = 'layout';
+
     /**
      * Construct object
      * 
@@ -15,6 +17,8 @@ class HighscoreController extends BaseController {
      */
 	public function __construct()
     {
+        parent::__construct(self::HIGHSCORE_LAYOUT);
+
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
         header('Access-Control-Allow-Headers: Content-Type, X-Requested-With');
