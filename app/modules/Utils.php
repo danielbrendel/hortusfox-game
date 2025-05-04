@@ -5,15 +5,18 @@
  */
 class Utils {
     /**
-     * @param $format
      * @return string
      */
-    public static function weeklyRemaining($format = '%a days')
+    public static function weeklyRemaining()
     {
         $now = Carbon::now();
         $nextMonday = Carbon::now()->next(Carbon::MONDAY)->startOfDay();
         $diff = $now->diff($nextMonday);
-
-        return $diff->format($format);
+        
+        if ($diff->format('%a') == 0) {
+            return strval($diff->h + 1) . ' hours';
+        }
+        
+        return $diff->format('%a days');
     }
 }

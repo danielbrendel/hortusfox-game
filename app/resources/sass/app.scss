@@ -79,6 +79,7 @@ html, body {
 
 .startmenu-screenshot img {
     width: 100%;
+    border-radius: 15px;
 }
 
 .startmenu-actions {
@@ -215,11 +216,17 @@ html, body {
 .highscore-list {
     position: relative;
     margin-top: 20px;
-    margin-bottom: 69px;
+    margin-bottom: 50px;
+}
+
+.highscore-filter {
+    position: relative;
+    margin-bottom: 30px;
 }
 
 .highscore-selection {
-    margin-bottom: 35px;
+    margin-bottom: 20px;
+    font-size: 0.9em;
 }
 
 .highscore-selection, .highscore-selection a {
@@ -234,6 +241,11 @@ html, body {
     text-decoration: underline;
 }
 
+.highscore-device {
+    position: relative;
+    font-size: 0.8em;
+}
+
 .highscore-delimiter {
     margin-left: 20px;
     margin-right: 20px;
@@ -245,6 +257,10 @@ html, body {
     margin-bottom: 20px;
     padding-left: 10px;
     padding-right: 10px;
+    font-size: 0.9em;
+    @media screen and (max-width: 768px) {
+        font-size: 0.8em;
+    }
 }
 
 .highscore-item:hover {
@@ -253,12 +269,20 @@ html, body {
     cursor: pointer;
 }
 
+.highscore-item-icon {
+    position: relative;
+    display: inline-block;
+    top: -1px;
+    width: 10%;
+}
+
 .highscore-item-player {
     position: relative;
     display: inline-block;
-    width: 89%;
-    @media screen and (max-width: 777px) {
-        width: 83%;
+    top: -3px;
+    width: 75%;
+    @media screen and (max-width: 768px) {
+        width: 75%;
     }
     text-align: left;
     color: rgb(102, 243, 100);
@@ -267,6 +291,7 @@ html, body {
 .highscore-item-score {
     position: relative;
     display: inline-block;
+    top: -3px;
     width: 10%;
     text-align: right;
     color: rgb(253, 232, 111);

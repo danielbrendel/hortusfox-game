@@ -1,13 +1,13 @@
 <?php
 
 /*
-    Asatru PHP - Migration for Example
+    Asatru PHP - Migration for Ratelimit
 */
 
 /**
  * This class specifies a migration
  */
-class Highscore_Migration {
+class Ratelimit_Migration {
     private $database = null;
     private $connection = null;
 
@@ -29,12 +29,10 @@ class Highscore_Migration {
      */
     public function up()
     {
-        $this->database = new Asatru\Database\Migration('Highscore', $this->connection);
+        $this->database = new Asatru\Database\Migration('Ratelimit', $this->connection);
         $this->database->drop();
         $this->database->add('id INT NOT NULL AUTO_INCREMENT PRIMARY KEY');
-        $this->database->add('playername VARCHAR(512) NOT NULL');
-        $this->database->add('score INT NOT NULL');
-        $this->database->add('mobile BOOLEAN NOT NULL');
+        $this->database->add('token VARCHAR(512) NOT NULL');
         $this->database->add('updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP');
         $this->database->add('created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP');
         $this->database->create();

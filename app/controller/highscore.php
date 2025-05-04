@@ -47,13 +47,14 @@ class HighscoreController extends BaseController {
     {
         try {
             $what = $request->params()->query('what', Highscore::HIGHSCORE_SELECTION_WEEKLY);
+            $device = $request->params()->query('device', null);
 
             if ($what === Highscore::HIGHSCORE_SELECTION_WEEKLY) {
-                $scores = Highscore::getWeekly();
+                $scores = Highscore::getWeekly($device);
             } else if ($what === Highscore::HIGHSCORE_SELECTION_ALLTIME) {
-                $scores = Highscore::getAllTime();
+                $scores = Highscore::getAllTime($device);
             }
-
+            
             return json([
                 'code' => 200,
                 'data' => $scores->asArray(),
@@ -76,10 +77,13 @@ class HighscoreController extends BaseController {
     public function add($request)
     {
         try {
+            Ratelimit::interfere();
+
             $playername = $request->params()->query('playername', 'Unnamed player');
             $score = $request->params()->query('score', 0);
+            $mobile = (bool)$request->params()->query('mobile', 0);
 
-            Highscore::addScore(trim($playername), $score);
+            Highscore::addScore(trim($playername), $score, $mobile);
 
             return json([
                 'code' => 200

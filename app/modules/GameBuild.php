@@ -28,6 +28,10 @@ class GameBuild {
             mkdir(public_path() . '/build/js');
         }
 
+        if (!is_dir(public_path() . '/build/img')) {
+            mkdir(public_path() . '/build/img');
+        }
+
         if (!is_dir(public_path() . '/build/game')) {
             mkdir(public_path() . '/build/game');
         }
@@ -57,6 +61,7 @@ class GameBuild {
         copy(public_path() . '/manifest.json', public_path() . '/build/manifest.json');
         copy(public_path() . '/serviceworker.js', public_path() . '/build/serviceworker.js');
         copy(public_path() . '/img/logo.png', public_path() . '/build/game/logo.png');
+        copy(public_path() . '/img/screenshot-game.png', public_path() . '/build/img/screenshot-game.png');
 
         $gamejs = file_get_contents(public_path() . '/game/game.js');
         $gamejs = str_replace('location.href = \'/\';', 'location.href = \'index.html\';', $gamejs);

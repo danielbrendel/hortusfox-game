@@ -30,36 +30,54 @@ window.ajaxRequest = function (method, url, data = {}, successfunc = function(da
         );
 };
 
-window.addHighscore = function(playername, score) {
-    window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/add', { playername: playername, score: score }, function(response) {
-        if (response.code == 200) {
+window.assumeMobileDevice = function() {
+    const userAgentMobile = /Mobi|Android|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const userAgentDataMobile = navigator.userAgentData?.mobile || false;
+    const smallScreen = window.innerWidth <= 768;
 
+    return userAgentMobile || userAgentDataMobile || smallScreen;
+};
+
+window.publishScores = function(playername, score, onsuccess = function() {}, onerror = function() {}) {
+    window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/add', { playername: playername, score: score, mobile: window.assumeMobileDevice() }, function(response) {
+        if (response.code == 200) {
+            onsuccess();
         } else {
-            console.error(response.msg);
+            onerror(response);
         }
     });
 };
 
-window.fetchHighscore = function(target, what, weekly) {
-    window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/list', { what: what }, function(response) {
+window.fetchHighscore = function(target, what, device, weekly) {
+    window.ajaxRequest('post', localStorage.getItem('service_url') + '/scores/list', { what: what, device: device }, function(response) {
         if (response.code == 200) {
             let elTarget = document.querySelector(target);
 
             elTarget.innerHTML = '';
 
-            response.data.forEach(function(elem, index) {
-                elTarget.innerHTML += `
-                    <div class="highscore-item">
-                        <div class="highscore-item-player">
-                            ` + elem.playername + `
-                        </div>
+            if (response.data.length > 0) {
+                response.data.forEach(function(elem, index) {
+                    const deviceIcon = (parseInt(elem.mobile)) ? '&#x1F4F1;' : '&#x1F4BB;';
 
-                        <div class="highscore-item-score">
-                            ` + elem.score + `
+                    elTarget.innerHTML += `
+                        <div class="highscore-item" data-device="` + ((elem.mobile) ? 'mobile' : 'desktop') + `">
+                            <div class="highscore-item-icon">
+                                ` + deviceIcon + `
+                            </div>
+
+                            <div class="highscore-item-player">
+                                ` + elem.playername + `
+                            </div>
+
+                            <div class="highscore-item-score">
+                                ` + elem.score + `
+                            </div>
                         </div>
-                    </div>
-                `;
-            });
+                    `;
+                });
+            } else {
+                elTarget.innerHTML = 'No one has entered the highscore list yet.';
+            }
 
             let elWeekly = document.querySelector(weekly);
             if (elWeekly) {
@@ -69,6 +87,47 @@ window.fetchHighscore = function(target, what, weekly) {
             console.error(response.msg);
         }
     });
+};
+
+window.filterHighscoreList = function(filter) {
+    const filterTypes = ['all', 'mobile', 'desktop'];
+
+    if (!filterTypes.includes(filter)) {
+        return;
+    }
+
+    let elems = document.querySelectorAll('.highscore-item');
+    if (elems) {
+        for (let i = 0; i < elems.length; i++) {
+            if (filter === 'all') {
+                if (elems[i].classList.contains('is-hidden')) {
+                    elems[i].classList.remove('is-hidden');
+                }
+            } else {
+                if (elems[i].dataset.device === filter) {
+                    if (elems[i].classList.contains('is-hidden')) {
+                        elems[i].classList.remove('is-hidden');
+                    }
+                } else {
+                    if (!elems[i].classList.contains('is-hidden')) {
+                        elems[i].classList.add('is-hidden');
+                    }
+                }
+            }
+        }
+    }
+};
+
+window.translateDeviceToken = function(token) {
+    if (token === 'all') {
+        return null;
+    } else if (token === 'mobile') {
+        return true;
+    } else if (token === 'desktop') {
+        return false;
+    }
+
+    return null;
 };
 
 window.showPrompt = function(label, cb = function(text) {}, deftext = '') {

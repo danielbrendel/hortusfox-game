@@ -21,29 +21,41 @@
             </div>
 
             <div class="startmenu-links">
+                @if (env('LINK_GITHUB'))
                 <div class="startmenu-links-item">
-                    <a href="{{ env('LINK_GITHUB') }}"><i class="fab fa-github"></i></a>
+                    <a href="{{ env('LINK_GITHUB') }}" target="_blank"><i class="fab fa-github"></i></a>
                 </div>
+                @endif
 
+                @if (env('LINK_DISCORD'))
                 <div class="startmenu-links-item">
-                    <a href="{{ env('LINK_DISCORD') }}"><i class="fab fa-discord"></i></a>
+                    <a href="{{ env('LINK_DISCORD') }}" target="_blank"><i class="fab fa-discord"></i></a>
                 </div>
+                @endif
 
+                @if (env('LINK_YOUTUBE'))
                 <div class="startmenu-links-item">
-                    <a href="{{ env('LINK_YOUTUBE') }}"><i class="fab fa-youtube"></i></a>
+                    <a href="{{ env('LINK_YOUTUBE') }}" target="_blank"><i class="fab fa-youtube"></i></a>
                 </div>
+                @endif
 
+                @if (env('LINK_FOSSVIDEO'))
                 <div class="startmenu-links-item">
-                    <a href="{{ env('LINK_FOSSVIDEO') }}"><i class="fas fa-video"></i></a>
+                    <a href="{{ env('LINK_FOSSVIDEO') }}" target="_blank"><i class="fas fa-video"></i></a>
                 </div>
+                @endif
 
+                @if (env('LINK_MASTODON'))
                 <div class="startmenu-links-item">
-                    <a href="{{ env('LINK_MASTODON') }}"><i class="fab fa-mastodon"></i></a>
+                    <a href="{{ env('LINK_MASTODON') }}" target="_blank"><i class="fab fa-mastodon"></i></a>
                 </div>
+                @endif
 
+                @if (env('LINK_PIXELFED'))
                 <div class="startmenu-links-item">
-                    <a href="{{ env('LINK_PIXELFED') }}"><i class="fas fa-camera"></i></a>
+                    <a href="{{ env('LINK_PIXELFED') }}" target="_blank"><i class="fas fa-camera"></i></a>
                 </div>
+                @endif
             </div>
 
             @if (env('APP_DEBUG'))

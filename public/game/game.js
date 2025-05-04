@@ -315,18 +315,19 @@ class HortusGame extends Phaser.Scene {
 
         }).setVisible(false);
 
-        this.btnRecord = this.add.text(gameconfig.scale.width / 2 - 45, gameconfig.scale.height / 2 + 145, 'Publish record', {
+        this.btnPublishScores = this.add.text(gameconfig.scale.width / 2 - 45, gameconfig.scale.height / 2 + 150, 'Publish highscore', {
             color: 'rgb(90, 235, 100)',
             fontSize: '20px'
         }).setInteractive().on('pointerdown', function() {
-            window.addHighscore(localStorage.getItem('playername'), localStorage.getItem('player_record'));
-            self.btnRecord.setVisible(false);
-            self.sndPublished.play();
+            window.publishScores(localStorage.getItem('playername'), localStorage.getItem('last_score'), function() {
+                self.sndPublished.play();
+                self.btnPublishScores.destroy();
+            });
         }).on('pointerover', function() {
-            self.btnRecord.setStyle({ color: 'rgb(124, 241, 132)', fontSize: '20px' });
+            self.btnPublishScores.setStyle({ color: 'rgb(124, 241, 132)', fontSize: '20px' });
             document.body.style.cursor = 'pointer';
         }).on('pointerout', function() {
-            self.btnRecord.setStyle({ color: 'rgb(90, 235, 100)', fontSize: '20px' });
+            self.btnPublishScores.setStyle({ color: 'rgb(90, 235, 100)', fontSize: '20px' });
             document.body.style.cursor = '';
         }).setVisible(false);
 
@@ -1070,11 +1071,6 @@ class HortusGame extends Phaser.Scene {
         if ((playerRecord === null) || (this.playerScore > playerRecord)) {
             localStorage.setItem('player_record', this.playerScore);
             playerRecord = this.playerScore;
-
-            if (!this.btnRecord.visible) {
-                this.btnRecord.setVisible(true);
-                this.children.bringToTop(this.btnRecord);
-            }
         }
 
         this.player.setVelocity(0, 0);
@@ -1104,8 +1100,6 @@ class HortusGame extends Phaser.Scene {
         if (!this.btnRestart.visible) {
             this.btnRestart.setVisible(true);
             this.children.bringToTop(this.btnRestart);
-
-            this.clearGameObjects();
         }
 
         if (!this.rectMainMenu.visible) {
@@ -1117,6 +1111,13 @@ class HortusGame extends Phaser.Scene {
             this.btnMainMenu.setVisible(true);
             this.children.bringToTop(this.btnMainMenu);
         }
+
+        if (!this.btnPublishScores.visible) {
+            this.btnPublishScores.setVisible(true);
+            this.children.bringToTop(this.btnPublishScores);
+        }
+
+        this.clearGameObjects();
     }
 
     restartGame()
